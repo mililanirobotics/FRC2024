@@ -1,0 +1,36 @@
+package frc.robot.subsystems;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import frc.robot.Constants.RollerIntakeConstants;
+
+public class RollerIntakeSubsystem extends SubsystemBase{
+    private CANSparkMax lowerRoller;
+    private CANSparkMax upperRoller;
+
+    public RollerIntakeSubsystem() {
+      lowerRoller = new CANSparkMax(RollerIntakeConstants.kLowerRollerPort, MotorType.kBrushless);
+      upperRoller = new CANSparkMax(RollerIntakeConstants.kUpperRollerPort, MotorType.kBrushless);
+
+      lowerRoller.setInverted(RollerIntakeConstants.kLowerRollerReverse);
+      upperRoller.setInverted(RollerIntakeConstants.kUpperRollerReverse);
+    }
+
+    public void setIntakeSpeed(double percentPower) {
+      lowerRoller.set(percentPower);
+      upperRoller.set(percentPower);
+    }
+
+    /*
+     * Testing method for adjusting roller speeds
+     */
+    public void setIndependentSpeed(double blueS, double greenS) {
+      lowerRoller.set(greenS);
+      upperRoller.set(blueS);
+    }
+
+    @Override
+    public void periodic() {
+    }
+}
