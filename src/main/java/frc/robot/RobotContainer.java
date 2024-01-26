@@ -5,11 +5,21 @@
 package frc.robot;
 
 import frc.robot.Constants.JoystickConstants;
+import frc.robot.Constants.IntakeConveyorConstants;
+
 import frc.robot.commands.IdentifyAprilTagCommand;
+import frc.robot.commands.IntakeConveyorCommand;
+import frc.robot.commands.VerticalConveyorCommand;
+
 import frc.robot.subsystems.AprilTagsSubsystem;
+import frc.robot.subsystems.IntakeConveyorSubsystem;
+import frc.robot.subsystems.VerticalConveyorSubsystem;
+
 import frc.robot.subsystems.AprilTagsSubsystem.Pipeline;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -23,9 +33,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   // The Robot's subsystems are defined here
   private final AprilTagsSubsystem m_AprilTagsSubsystem = new AprilTagsSubsystem();
+  private final IntakeConveyorSubsystem m_IntakeConveyorSubsystem = new IntakeConveyorSubsystem();
+  private final VerticalConveyorSubsystem m_VerticalConveyorSubsystem = new VerticalConveyorSubsystem();
 
   // The Robot's commands are defined here
   private final IdentifyAprilTagCommand identifyAprilTagCommand = new IdentifyAprilTagCommand();
+
+  // IR Break Beam Sensor Object Defined here (May be removed)
+  // private final DigitalInput PayloadBeamSensor = new DigitalInput(ConveyorIntakeConstants.kRollerIRBeamPort);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed (and port)
   private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kPrimaryPort);
@@ -49,11 +64,15 @@ public class RobotContainer {
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     
-    // new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort)
-    //   .onTrue(
-        
-    //   );
+    new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort)
+      .onTrue(
+        new VerticalConveyorCommand(m_VerticalConveyorSubsystem)
+      );
 
+    new JoystickButton(secondaryJoystick, JoystickConstants.kXButtonPort)
+      .onTrue(
+        FullPayloadSystem()
+      ); 
   }
 
   /**
@@ -65,4 +84,21 @@ public class RobotContainer {
   //   // An example command will be run in autonomous
   //   return Autos.exampleAuto();
   // }
+
+  // Placeholder Methods for use in multiple classes
+
+  /*
+   * Conditional Command Group that controls the intake or conveyor in phases, depending on what breakbeam sensor is broken.
+   * If the Intake beam isn't broken, run the Intake Conveyor Command. 
+   * If the Intake beam is broken, run the Vertical Conveyor Command until the Vertical Conveyor beam is broken.
+   * Conditional Command should restart over again once the note passes both sensors.
+   */
+  public Command FullPayloadSystem() {
+    return 
+    new ConditionalCommand(
+      new IntakeConveyorCommand(secondaryJoystick, m_IntakeConveyorSubsystem), 
+      new VerticalConveyorCommand(m_VerticalConveyorSubsystem).until(m_VerticalConveyorSubsystem::isVerticalBeamBroken), 
+      m_IntakeConveyorSubsystem::isIntakeBeamBroken);
+  }
+
 }

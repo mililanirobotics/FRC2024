@@ -18,14 +18,28 @@ public final class Constants {
 
   }
 
-  public static class RollerIntakeConstants {
-    public static final int kLowerRollerPort = 3;
-    public static final int kUpperRollerPort = 2;
-    public static final boolean kLowerRollerReverse = false;
-    public static final boolean kUpperRollerReverse = false;
+  public static class IntakeConveyorConstants {
+    public static final int kBottomConveyorPort = 3;
+    public static final int kTopConveyorPort = 2;
+    public static final int kIntakeIRBeamPort = 0;
 
-    public static final double kIntakeSpeed = 1;
-    public static final double kGroundHeight = 1.75; //Height of the rollers from the ground
+    public static final boolean kBottomConveyorReverse = false;
+    public static final boolean kTopConveyorReverse = false;
+
+    public static final double kIntakeSpeed = 0.1; // Static speed for the Intake (Currently in testing)
+    public static final double kGroundHeight = 1.75; // Height of the rollers from the ground
+  }
+
+  public static class VerticalConveyorConstants {
+    public static final int kFrontConveyorPort = 4;
+    public static final int kBackConveyorPort = 5;
+    public static final int kVerticalIRBeamPort = 1;
+
+    public static final boolean kFrontConveyorReversed = false;
+    public static final boolean kBackConveyorReversed = true;
+
+    public static final double kConveyorSpeed = 0.1; // Static value for the Vertical Conveyor Speed (Currently in testing)
+    
   }
 
   public final class LimeLightConstants {

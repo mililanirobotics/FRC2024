@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 //subsystems and commands
-import frc.robot.subsystems.RollerIntakeSubsystem;
+import frc.robot.subsystems.IntakeConveyorSubsystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 //general imports
 import frc.robot.Constants.JoystickConstants;
 
-public class RollerIntakeCommand extends CommandBase {
+public class IntakeConveyorCommand extends CommandBase {
     //declaring subsystems
-    private RollerIntakeSubsystem m_rollerSubsystem;
+    private IntakeConveyorSubsystem m_IntakeConveyorSubsystem;
 
     //declaring the joystick used
     private GenericHID joystick;
@@ -21,13 +21,13 @@ public class RollerIntakeCommand extends CommandBase {
     private double blueSpeed;
 
     //constructor
-    public RollerIntakeCommand(GenericHID joystick, RollerIntakeSubsystem rollerIntakeSubsystem) {
+    public IntakeConveyorCommand(GenericHID joystick, IntakeConveyorSubsystem intakeConveyorSubsystem) {
         this.joystick = joystick;
-        m_rollerSubsystem = rollerIntakeSubsystem;
+        m_IntakeConveyorSubsystem = intakeConveyorSubsystem;
         blueSpeed = 0;
         greenSpeed = 0;
 
-        addRequirements(m_rollerSubsystem);
+        addRequirements(m_IntakeConveyorSubsystem);
     }
     
     @Override
@@ -54,17 +54,17 @@ public class RollerIntakeCommand extends CommandBase {
         SmartDashboard.putNumber("Blue speed", blueSpeed);
         SmartDashboard.updateValues();
 
-        m_rollerSubsystem.setIndependentSpeed(blueSpeed, greenSpeed);
+        m_IntakeConveyorSubsystem.setIndependentSpeed(blueSpeed, greenSpeed);
     }
 
     @Override
     public void end(boolean interrupted) {
-        m_rollerSubsystem.setIndependentSpeed(0, 0);
+        m_IntakeConveyorSubsystem.shutdown();
     }
 
     //in progress
     @Override
     public boolean isFinished() {
-        return false;
+        return m_IntakeConveyorSubsystem.isIntakeBeamBroken();
     }
 }
