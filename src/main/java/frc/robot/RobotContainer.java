@@ -96,7 +96,7 @@ public class RobotContainer {
   public Command FullPayloadSystem() {
     return 
     new ConditionalCommand(
-      new IntakeConveyorCommand(secondaryJoystick, m_IntakeConveyorSubsystem), 
+      new IntakeConveyorCommand(m_IntakeConveyorSubsystem), 
       new VerticalConveyorCommand(m_VerticalConveyorSubsystem).until(m_VerticalConveyorSubsystem::isVerticalBeamBroken), 
       m_IntakeConveyorSubsystem::isIntakeBeamBroken);
   }
