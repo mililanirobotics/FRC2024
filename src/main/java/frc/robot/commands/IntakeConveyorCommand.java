@@ -2,11 +2,9 @@ package frc.robot.commands;
 
 //subsystems and commands
 import frc.robot.subsystems.IntakeConveyorSubsystem;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //general imports
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.JoystickConstants;
 import frc.robot.Constants.IntakeConveyorConstants;
 
 public class IntakeConveyorCommand extends Command {
