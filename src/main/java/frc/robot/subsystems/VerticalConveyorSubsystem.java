@@ -10,13 +10,13 @@ import frc.robot.Constants.VerticalConveyorConstants;
 public class VerticalConveyorSubsystem extends SubsystemBase{
     private CANSparkMax frontConveyor;
     private CANSparkMax backConveyor;
-    private DigitalInput breakBeam;
+    private DigitalInput verticalBreakBeam;
 
     public VerticalConveyorSubsystem () {
         frontConveyor = new CANSparkMax(VerticalConveyorConstants.kFrontConveyorPort, MotorType.kBrushless);
         backConveyor = new CANSparkMax(VerticalConveyorConstants.kBackConveyorPort, MotorType.kBrushless);
 
-        DigitalInput breakBeam = new DigitalInput(VerticalConveyorConstants.kVerticalIRBeamPort);
+        DigitalInput verticalBreakBeam = new DigitalInput(VerticalConveyorConstants.kVerticalIRBeamPort);
     }
 
     public void setVerticalSpeed(double percentPower) {
@@ -30,7 +30,7 @@ public class VerticalConveyorSubsystem extends SubsystemBase{
     }
 
     public boolean isVerticalBeamBroken() {
-        return !breakBeam.get();
+        return verticalBreakBeam.get();
     }
 
 }

@@ -45,7 +45,7 @@ public class IntakeConveyorSubsystem extends SubsystemBase{
      * Returns the breakbeam's condition of being broken or not
      */
     public boolean isIntakeBeamBroken() {
-      return !IntakeBreakBeam.get();
+      return IntakeBreakBeam.get();
     }
 
     @Override

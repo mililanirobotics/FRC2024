@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -71,7 +73,7 @@ public class RobotContainer {
 
     new JoystickButton(secondaryJoystick, JoystickConstants.kXButtonPort)
       .onTrue(
-        FullPayloadSystem()
+        SensorTestSystem()
       ); 
   }
 
@@ -93,7 +95,7 @@ public class RobotContainer {
    * If the Intake beam is broken, run the Vertical Conveyor Command until the Vertical Conveyor beam is broken.
    * Conditional Command should restart over again once the note passes both sensors.
    */
-  public Command FullPayloadSystem() {
+  public Command SensorTestSystem() {
     return 
     new ConditionalCommand(
       new IntakeConveyorCommand(m_IntakeConveyorSubsystem), 
@@ -101,4 +103,16 @@ public class RobotContainer {
       m_IntakeConveyorSubsystem::isIntakeBeamBroken);
   }
 
+  /*
+   * Mockup of the final program's payload command sequence.
+   */
+  public Command FullPayloadsystem() {
+    return 
+    new SequentialCommandGroup(
+      new ParallelCommandGroup(
+        new IntakeConveyorCommand(m_IntakeConveyorSubsystem),
+        new VerticalConveyorCommand(m_VerticalConveyorSubsystem)
+        )
+    );
+  }
 }
