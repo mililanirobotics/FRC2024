@@ -5,11 +5,20 @@
 package frc.robot;
 
 import frc.robot.Constants.JoystickConstants;
-import frc.robot.commands.IdentifyAprilTagCommand;
-import frc.robot.subsystems.AprilTagsSubsystem;
-import frc.robot.subsystems.AprilTagsSubsystem.Pipeline;
+import frc.robot.commands.ManualConveyorCommand;
+import frc.robot.commands.TestAutoConveyorCommand;
+import frc.robot.commands.TestAutoIntakeCommand;
+import frc.robot.commands.TestManualIntakeCommand;
+import frc.robot.commands.TestManualScoringCommand;
+import frc.robot.subsystems.ConveyorSubsystem;
+import frc.robot.subsystems.RollerIntakeSubsystem;
+import frc.robot.subsystems.ScoringSubsystem;
+import frc.robot.subsystems.SwerveDriveSubsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -21,18 +30,28 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The Robot's subsystems are defined here
-  private final AprilTagsSubsystem m_AprilTagsSubsystem = new AprilTagsSubsystem();
+  //initializing subsystems
+  // private final AprilTagsSubsystem aprilTagsSubsystem = new AprilTagsSubsystem();
+  private final ConveyorSubsystem conveyorSubsystem = new ConveyorSubsystem();
+  private final RollerIntakeSubsystem intakeSubsystem = new RollerIntakeSubsystem();
+  private final ScoringSubsystem scoringSubsytem = new ScoringSubsystem();
+  private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem();
 
-  // The Robot's commands are defined here
-  private final IdentifyAprilTagCommand identifyAprilTagCommand = new IdentifyAprilTagCommand();
+  //initailizing gamepads
+  private final GenericHID priamryJoystick = new GenericHID(JoystickConstants.kPrimaryPort);
+  private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kSecondaryPort);
+  private final GenericHID thirdJoystick = new GenericHID(2);
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed (and port)
-  private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kPrimaryPort);
-
+  //initializing limit switch
+  private final DigitalInput intakeLimitSwitch = new DigitalInput(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    //creating default commands for manually controller the intake, conveyor, and scorer
+    intakeSubsystem.setDefaultCommand(new TestManualIntakeCommand(secondaryJoystick, intakeSubsystem));
+    conveyorSubsystem.setDefaultCommand(new ManualConveyorCommand(thirdJoystick, conveyorSubsystem));
+    scoringSubsytem.setDefaultCommand(new TestManualScoringCommand(priamryJoystick, scoringSubsytem));
+
     // Configure the trigger bindings
     configureBindings();
   }
@@ -47,22 +66,24 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    
+    //runs the automated scoring command when pressing the A button on the secondary gamepad
     // new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort)
-    //   .onTrue(
-        
-    //   );
+    // .onTrue(
 
+    //   IntakeToScoringCommand()
+    // );
   }
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
+   * Returns a sequential command that goes through the motion of scoring (uses limit switches)
+   * @return The full scoring sequential command
    */
-  // public Command getAutonomousCommand() {
-  //   // An example command will be run in autonomous
-  //   return Autos.exampleAuto();
-  // }
+  public Command IntakeToScoringCommand() {
+    return new SequentialCommandGroup(
+      new TestAutoIntakeCommand(intakeSubsystem, conveyorSubsystem, intakeLimitSwitch, 1),
+      new TestAutoConveyorCommand(conveyorSubsystem, intakeLimitSwitch, 1),
+      new PrintCommand("Command Ended")
+    );
+  }
 }
+  

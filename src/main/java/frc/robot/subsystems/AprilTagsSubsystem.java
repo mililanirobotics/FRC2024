@@ -1,11 +1,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTable;
-//constants
-import frc.robot.Constants; 
+import edu.wpi.first.networktables.NetworkTable; 
 
 
 public class AprilTagsSubsystem extends SubsystemBase{
