@@ -29,6 +29,19 @@ public final class Constants {
     public static final double kIntakeDeadband = 0.05;
   }
 
+  public static class VerticalConveyorConstants {
+    public static final int kFrontConveyorPort = 4;
+    public static final int kBackConveyorPort = 5;
+    public static final int kVerticalIRBeamPort = 1;
+
+    public static final boolean kFrontConveyorReversed = false;
+    public static final boolean kBackConveyorReversed = true;
+
+    public static final double kConveyorSpeed = 0.1; // Static value for the Vertical Conveyor Speed (Currently in testing)
+    
+  }
+
+
   public static class ConveyorConstants {
     //ports and directionality of conveyors
     public static final int kLeftConveyorPort = 9;
@@ -48,8 +61,8 @@ public final class Constants {
     public static final boolean kLowerFlywheelReverse = true; 
     public static final int kScoringSensorPort = 1;
 
-    public static final double topRollerSpeed = 0.5;
-    public static final double botRollerSpeed = -0.5;
+    public static final double topRollerSpeed = 1;
+    public static final double botRollerSpeed = 0.3;
   }
 
   public final class LimeLightConstants {
@@ -57,7 +70,6 @@ public final class Constants {
     public static final double kMountAngle = 0; //Placeholder
 
     public static final double kTargetAMPHeight = 52.25; // Height of the center of the AMP's AprilTag from the ground 
-    
   }
 
   public final class JoystickConstants {
