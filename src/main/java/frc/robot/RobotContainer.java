@@ -18,6 +18,16 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+
+import frc.robot.commands.IdentifyAprilTagCommand;
+import frc.robot.commands.VerticalConveyorCommand;
+
+import frc.robot.subsystems.AprilTagsSubsystem;
+import frc.robot.subsystems.VerticalConveyorSubsystem;
+
+import frc.robot.subsystems.AprilTagsSubsystem.Pipeline;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -41,6 +51,16 @@ public class RobotContainer {
   private final GenericHID priamryJoystick = new GenericHID(JoystickConstants.kPrimaryPort);
   private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kSecondaryPort);
   private final GenericHID thirdJoystick = new GenericHID(2);
+
+  // The Robot's subsystems are defined here
+  private final AprilTagsSubsystem m_AprilTagsSubsystem = new AprilTagsSubsystem();
+  private final VerticalConveyorSubsystem m_VerticalConveyorSubsystem = new VerticalConveyorSubsystem();
+
+  // The Robot's commands are defined here
+  private final IdentifyAprilTagCommand identifyAprilTagCommand = new IdentifyAprilTagCommand();
+
+  // IR Break Beam Sensor Object Defined here (May be removed)
+  // private final DigitalInput PayloadBeamSensor = new DigitalInput(ConveyorIntakeConstants.kRollerIRBeamPort);
 
   //initializing limit switch
   private final DigitalInput intakeLimitSwitch = new DigitalInput(0);
@@ -72,6 +92,12 @@ public class RobotContainer {
 
     //   IntakeToScoringCommand()
     // );
+    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    
+    new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort)
+      .onTrue(
+        new VerticalConveyorCommand(m_VerticalConveyorSubsystem)
+      );
   }
 
   /**
@@ -85,5 +111,12 @@ public class RobotContainer {
       new PrintCommand("Command Ended")
     );
   }
+  // public Command getAutonomousCommand() {
+  //   // An example command will be run in autonomous
+  //   return Autos.exampleAuto();
+  // }
+
+  // Placeholder Methods for use in multiple classes
+
 }
   
