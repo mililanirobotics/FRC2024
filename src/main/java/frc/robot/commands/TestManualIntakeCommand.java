@@ -3,8 +3,6 @@ package frc.robot.commands;
 //subsystems and commands
 import frc.robot.subsystems.RollerIntakeSubsystem;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 //general imports
