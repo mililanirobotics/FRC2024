@@ -5,20 +5,23 @@
 package frc.robot;
 
 import frc.robot.Constants.JoystickConstants;
-import frc.robot.Constants.IntakeConveyorConstants;
 
-import frc.robot.commands.IdentifyAprilTagCommand;
-import frc.robot.commands.IntakeConveyorCommand;
-import frc.robot.commands.VerticalConveyorCommand;
+import frc.robot.commands.TestCommands.TestManualIntakeCommand;
+import frc.robot.commands.TestCommands.TestManualScoringCommand;
+import frc.robot.commands.AutomationCommands.AutoIntakeCommand;
 
-import frc.robot.subsystems.AprilTagsSubsystem;
-import frc.robot.subsystems.IntakeConveyorSubsystem;
-import frc.robot.subsystems.VerticalConveyorSubsystem;
-
-import frc.robot.subsystems.AprilTagsSubsystem.Pipeline;
+import frc.robot.subsystems.IntakeRollerSubsystem;
+import frc.robot.subsystems.ScoringSubsystem;
+import frc.robot.subsystems.SwerveDriveSubsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+
+import frc.robot.commands.IdentifyAprilTagCommand;
+import frc.robot.subsystems.AprilTagsSubsystem;
+import frc.robot.subsystems.ConveyorSubsystem;
+import frc.robot.subsystems.AprilTagsSubsystem.Pipeline;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -33,10 +36,19 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The Robot's subsystems are defined here
-  private final AprilTagsSubsystem m_AprilTagsSubsystem = new AprilTagsSubsystem();
-  private final IntakeConveyorSubsystem m_IntakeConveyorSubsystem = new IntakeConveyorSubsystem();
-  private final VerticalConveyorSubsystem m_VerticalConveyorSubsystem = new VerticalConveyorSubsystem();
+  //initializing subsystems
+  private final AprilTagsSubsystem aprilTagsSubsystem = new AprilTagsSubsystem();
+  private final IntakeRollerSubsystem intakeRollerSubsystem = new IntakeRollerSubsystem();
+  private final ConveyorSubsystem conveyorSubsystem = new ConveyorSubsystem();
+  private final ScoringSubsystem scoringSubsytem = new ScoringSubsystem();
+  private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem();
+
+  //initailizing gamepads
+  private final GenericHID priamryJoystick = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
+  private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kSecondaryGamepadPort);
+  private final GenericHID thirdJoystick = new GenericHID(2);
+
+  
 
   // The Robot's commands are defined here
   private final IdentifyAprilTagCommand identifyAprilTagCommand = new IdentifyAprilTagCommand();
@@ -44,12 +56,16 @@ public class RobotContainer {
   // IR Break Beam Sensor Object Defined here (May be removed)
   // private final DigitalInput PayloadBeamSensor = new DigitalInput(ConveyorIntakeConstants.kRollerIRBeamPort);
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed (and port)
-  private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kPrimaryPort);
-
+  //initializing limit switch
+  private final DigitalInput intakeLimitSwitch = new DigitalInput(0);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    //creating default commands for manually controller the intake, conveyor, and scorer
+    intakeRollerSubsystem.setDefaultCommand(new TestManualIntakeCommand(secondaryJoystick, intakeRollerSubsystem));
+    // conveyorSubsystem.setDefaultCommand(new TestManualConveyorCommand(thirdJoystick, conveyorSubsystem));
+    scoringSubsytem.setDefaultCommand(new TestManualScoringCommand(priamryJoystick, scoringSubsytem));
+
     // Configure the trigger bindings
     configureBindings();
   }
@@ -64,24 +80,31 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    //runs the automated scoring command when pressing the A button on the secondary gamepad
+    // new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort)
+    // .onTrue(
+
+    //   IntakeToScoringCommand()
+    // );
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
     
-    new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort)
-      .onTrue(
-        new VerticalConveyorCommand(m_VerticalConveyorSubsystem)
-      );
-
-    new JoystickButton(secondaryJoystick, JoystickConstants.kXButtonPort)
-      .onTrue(
-        SensorTestSystem()
-      ); 
+    
   }
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
+   * Returns a sequential command that goes through the motion of scoring (uses limit switches)
+   * @return The full scoring sequential command
    */
+  public Command IntakeToScoringCommand() {
+    return new SequentialCommandGroup(
+      new AutoIntakeCommand(intakeRollerSubsystem, conveyorSubsystem, intakeLimitSwitch, 1)
+    );
+      // new SequentialCommandGroup(
+      //   new AutoIntakeCommand(IntakeRollerSubsystem, conveyorSubsystem, intakeLimitSwitch, 1),
+      //   new AutoConveyorCommand(conveyorSubsystem, intakeLimitSwitch, 1),
+      //   new PrintCommand("Command Ended")
+      // );
+  }
   // public Command getAutonomousCommand() {
   //   // An example command will be run in autonomous
   //   return Autos.exampleAuto();
@@ -89,30 +112,5 @@ public class RobotContainer {
 
   // Placeholder Methods for use in multiple classes
 
-  /*
-   * Conditional Command Group that controls the intake or conveyor in phases, depending on what breakbeam sensor is broken.
-   * If the Intake beam isn't broken, run the Intake Conveyor Command. 
-   * If the Intake beam is broken, run the Vertical Conveyor Command until the Vertical Conveyor beam is broken.
-   * Conditional Command should restart over again once the note passes both sensors.
-   */
-  public Command SensorTestSystem() {
-    return 
-    new ConditionalCommand(
-      new IntakeConveyorCommand(m_IntakeConveyorSubsystem), 
-      new VerticalConveyorCommand(m_VerticalConveyorSubsystem).until(m_VerticalConveyorSubsystem::isVerticalBeamBroken), 
-      m_IntakeConveyorSubsystem::isIntakeBeamBroken);
-  }
-
-  /*
-   * Mockup of the final program's payload command sequence.
-   */
-  public Command FullPayloadsystem() {
-    return 
-    new SequentialCommandGroup(
-      new ParallelCommandGroup(
-        new IntakeConveyorCommand(m_IntakeConveyorSubsystem),
-        new VerticalConveyorCommand(m_VerticalConveyorSubsystem)
-        )
-    );
-  }
 }
+  

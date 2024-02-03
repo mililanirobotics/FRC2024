@@ -1,22 +1,22 @@
 package frc.robot.commands;
 
 //subsystems and commands
-import frc.robot.subsystems.IntakeConveyorSubsystem;
+import frc.robot.subsystems.IntakeRollerSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //general imports
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.IntakeConveyorConstants;
+import frc.robot.Constants.RollerIntakeConstants;
 
-public class IntakeConveyorCommand extends Command {
+public class IntakeRollerCommand extends Command {
     //declaring subsystems
-    private IntakeConveyorSubsystem m_IntakeConveyorSubsystem;
+    private IntakeRollerSubsystem m_IntakeConveyorSubsystem;
 
     //speed
     // private double greenSpeed;
     // private double blueSpeed;
 
     //constructor
-    public IntakeConveyorCommand(IntakeConveyorSubsystem intakeConveyorSubsystem) {
+    public IntakeRollerCommand(IntakeRollerSubsystem intakeConveyorSubsystem) {
 
         m_IntakeConveyorSubsystem = intakeConveyorSubsystem;
         // blueSpeed = 0;
@@ -49,7 +49,7 @@ public class IntakeConveyorCommand extends Command {
         // SmartDashboard.putNumber("Blue speed", blueSpeed);
         // SmartDashboard.updateValues();
 
-        m_IntakeConveyorSubsystem.setIntakeSpeed(IntakeConveyorConstants.kIntakeSpeed);
+        m_IntakeConveyorSubsystem.setIntakeSpeed(RollerIntakeConstants.kIntakeSpeed);
     }
 
     @Override
@@ -60,6 +60,6 @@ public class IntakeConveyorCommand extends Command {
     //in progress
     @Override
     public boolean isFinished() {
-        return m_IntakeConveyorSubsystem.isIntakeBeamBroken();
+        return m_IntakeConveyorSubsystem.isRollerBeamBroken();
     }
 }

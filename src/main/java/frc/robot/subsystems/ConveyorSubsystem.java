@@ -5,21 +5,21 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.VerticalConveyorConstants;
+import frc.robot.Constants.ConveyorConstants;
 
-public class VerticalConveyorSubsystem extends SubsystemBase{
+public class ConveyorSubsystem extends SubsystemBase{
     private CANSparkMax frontConveyor;
     private CANSparkMax backConveyor;
     private DigitalInput verticalBreakBeam;
 
-    public VerticalConveyorSubsystem () {
-        frontConveyor = new CANSparkMax(VerticalConveyorConstants.kFrontConveyorPort, MotorType.kBrushless);
-        backConveyor = new CANSparkMax(VerticalConveyorConstants.kBackConveyorPort, MotorType.kBrushless);
+    public ConveyorSubsystem () {
+        frontConveyor = new CANSparkMax(ConveyorConstants.kFrontConveyorPort, MotorType.kBrushless);
+        backConveyor = new CANSparkMax(ConveyorConstants.kBackConveyorPort, MotorType.kBrushless);
 
-        DigitalInput verticalBreakBeam = new DigitalInput(VerticalConveyorConstants.kVerticalIRBeamPort);
+        verticalBreakBeam = new DigitalInput(ConveyorConstants.kVerticalIRBeamPort);
     }
 
-    public void setVerticalSpeed(double percentPower) {
+    public void setConveyorSpeed(double percentPower) {
         frontConveyor.set(percentPower);
         backConveyor.set(percentPower);
     }
