@@ -8,6 +8,7 @@ import frc.robot.Constants.JoystickConstants;
 
 import frc.robot.commands.TestCommands.TestManualIntakeCommand;
 import frc.robot.commands.TestCommands.TestManualScoringCommand;
+import frc.robot.commands.VisiontrackingCommands.IdentifyAprilTagCommand;
 import frc.robot.commands.AutomationCommands.AutoIntakeCommand;
 
 import frc.robot.subsystems.IntakeRollerSubsystem;
@@ -17,8 +18,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
-
-import frc.robot.commands.IdentifyAprilTagCommand;
 import frc.robot.subsystems.AprilTagsSubsystem;
 import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.AprilTagsSubsystem.Pipeline;
@@ -51,7 +50,7 @@ public class RobotContainer {
   
 
   // The Robot's commands are defined here
-  private final IdentifyAprilTagCommand identifyAprilTagCommand = new IdentifyAprilTagCommand();
+  private final IdentifyAprilTagCommand identifyAprilTagCommand = new IdentifyAprilTagCommand(aprilTagsSubsystem);
 
   // IR Break Beam Sensor Object Defined here (May be removed)
   // private final DigitalInput PayloadBeamSensor = new DigitalInput(ConveyorIntakeConstants.kRollerIRBeamPort);

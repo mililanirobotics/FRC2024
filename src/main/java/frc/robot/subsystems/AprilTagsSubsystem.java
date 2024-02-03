@@ -46,13 +46,14 @@ public class AprilTagsSubsystem extends SubsystemBase{
 
     /**
      * Returns the vertical offset from the crosshair to the target
-     * @return vertical offset from the target from -24.85 to +24.85
+     * @return vertical offset from the target from -24.85 to +24.85 degrees
      */
     public double getVerticalOffset() {
         double verticalOffset = table.getEntry("ty").getDouble(0);
         return verticalOffset;  
     }
 
+    
     /**
      * Sets the current pipeline on the limelight to the desired one
      * @param pipeline sets the limelight's current pipeline

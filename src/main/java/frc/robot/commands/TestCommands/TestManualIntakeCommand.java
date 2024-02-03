@@ -9,7 +9,7 @@ import frc.robot.Constants.JoystickConstants;
 
 public class TestManualIntakeCommand extends Command {
     //declaring subsystems
-    private IntakeRollerSubsystem m_conveyorSubsystem;
+    private IntakeRollerSubsystem m_IntakeRollerSubsystem;
 
     //declaring the joystick used
     private GenericHID joystick;
@@ -18,12 +18,12 @@ public class TestManualIntakeCommand extends Command {
     private double conveyorSpeed;
 
     //constructor
-    public TestManualIntakeCommand(GenericHID joystick, IntakeRollerSubsystem conveyorSubsystem) {
+    public TestManualIntakeCommand(GenericHID joystick, IntakeRollerSubsystem intakeRollerSubsystem) {
         this.joystick = joystick;
-        m_conveyorSubsystem = conveyorSubsystem;
+        m_IntakeRollerSubsystem = intakeRollerSubsystem;
         conveyorSpeed = 0;
 
-        addRequirements(m_conveyorSubsystem);
+        addRequirements(m_IntakeRollerSubsystem);
     }
     
     @Override
@@ -49,7 +49,7 @@ public class TestManualIntakeCommand extends Command {
 
         //sets the speeds
         if(joystick.getRawButtonPressed(JoystickConstants.kStartButtonPort)) {
-            m_conveyorSubsystem.setConveyorSpeed(conveyorSpeed);
+            m_IntakeRollerSubsystem.setIntakeSpeed(conveyorSpeed);
         }
         
         // conveyorSpeed = joystick.getRawAxis(JoystickConstants.kRightYJoystickPort);
@@ -61,7 +61,7 @@ public class TestManualIntakeCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        m_conveyorSubsystem.shutdown();
+        m_IntakeRollerSubsystem.shutdown();
     }
 
     //in progress
