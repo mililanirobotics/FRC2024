@@ -1,15 +1,15 @@
-package frc.robot.commands;
+package frc.robot.commands.TestCommands;
 
-import frc.robot.subsystems.ConveyorSubsystem;
+import frc.robot.subsystems.IntakeConveyorSubsystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 //general imports
 import frc.robot.Constants.JoystickConstants;
 
-public class ManualConveyorCommand extends Command {
+public class TestManualConveyorCommand extends Command {
     //declaring subsystems
-    private ConveyorSubsystem m_conveyorSubsystem;
+    private IntakeConveyorSubsystem m_conveyorSubsystem;
 
     //declaring the joystick used
     private GenericHID joystick;
@@ -18,7 +18,7 @@ public class ManualConveyorCommand extends Command {
     private double conveyorSpeed;
 
     //constructor
-    public ManualConveyorCommand(GenericHID joystick, ConveyorSubsystem conveyorSubsystem) {
+    public TestManualConveyorCommand(GenericHID joystick, IntakeConveyorSubsystem conveyorSubsystem) {
         this.joystick = joystick;
         m_conveyorSubsystem = conveyorSubsystem;
         conveyorSpeed = 0;

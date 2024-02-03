@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.AutomationCommands;
 
 import frc.robot.Constants.ScoringConstants;
 import frc.robot.subsystems.ScoringSubsystem;

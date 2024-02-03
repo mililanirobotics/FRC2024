@@ -5,13 +5,12 @@
 package frc.robot;
 
 import frc.robot.Constants.JoystickConstants;
-import frc.robot.commands.ManualConveyorCommand;
 import frc.robot.commands.TestAutoConveyorCommand;
 import frc.robot.commands.TestAutoIntakeCommand;
 import frc.robot.commands.TestManualIntakeCommand;
 import frc.robot.commands.TestManualScoringCommand;
-import frc.robot.subsystems.ConveyorSubsystem;
-import frc.robot.subsystems.RollerIntakeSubsystem;
+import frc.robot.subsystems.IntakeConveyorSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -21,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 
 import frc.robot.commands.IdentifyAprilTagCommand;
 import frc.robot.commands.VerticalConveyorCommand;
-
+import frc.robot.commands.TestCommands.TestManualConveyorCommand;
 import frc.robot.subsystems.AprilTagsSubsystem;
 import frc.robot.subsystems.VerticalConveyorSubsystem;
 
@@ -42,8 +41,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
   //initializing subsystems
   // private final AprilTagsSubsystem aprilTagsSubsystem = new AprilTagsSubsystem();
-  private final ConveyorSubsystem conveyorSubsystem = new ConveyorSubsystem();
-  private final RollerIntakeSubsystem intakeSubsystem = new RollerIntakeSubsystem();
+  private final IntakeConveyorSubsystem conveyorSubsystem = new IntakeConveyorSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final ScoringSubsystem scoringSubsytem = new ScoringSubsystem();
   private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem();
 
@@ -69,7 +68,7 @@ public class RobotContainer {
   public RobotContainer() {
     //creating default commands for manually controller the intake, conveyor, and scorer
     intakeSubsystem.setDefaultCommand(new TestManualIntakeCommand(secondaryJoystick, intakeSubsystem));
-    conveyorSubsystem.setDefaultCommand(new ManualConveyorCommand(thirdJoystick, conveyorSubsystem));
+    conveyorSubsystem.setDefaultCommand(new TestManualConveyorCommand(thirdJoystick, conveyorSubsystem));
     scoringSubsytem.setDefaultCommand(new TestManualScoringCommand(priamryJoystick, scoringSubsytem));
 
     // Configure the trigger bindings
@@ -106,8 +105,8 @@ public class RobotContainer {
    */
   public Command IntakeToScoringCommand() {
     return new SequentialCommandGroup(
-      new TestAutoIntakeCommand(intakeSubsystem, conveyorSubsystem, intakeLimitSwitch, 1),
-      new TestAutoConveyorCommand(conveyorSubsystem, intakeLimitSwitch, 1),
+      new AutoIntakeCommand(intakeSubsystem, conveyorSubsystem, intakeLimitSwitch, 1),
+      new AutoConveyorCommand(conveyorSubsystem, intakeLimitSwitch, 1),
       new PrintCommand("Command Ended")
     );
   }

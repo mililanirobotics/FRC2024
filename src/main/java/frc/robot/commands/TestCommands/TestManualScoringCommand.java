@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.TestCommands;
 
 //subsystems and commands
 import frc.robot.subsystems.ScoringSubsystem;

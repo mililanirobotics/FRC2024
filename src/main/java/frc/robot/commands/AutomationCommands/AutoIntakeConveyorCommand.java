@@ -1,22 +1,22 @@
-package frc.robot.commands;
+package frc.robot.commands.AutomationCommands;
 
-import frc.robot.subsystems.ConveyorSubsystem;
+import frc.robot.subsystems.IntakeConveyorSubsystem;
 //subsystems and commands
-import frc.robot.subsystems.RollerIntakeSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class TestAutoIntakeCommand extends Command {
+public class AutoIntakeCommand extends Command {
     //declaring subsystems
-    private RollerIntakeSubsystem m_rollerSubsystem;
-    private ConveyorSubsystem m_conveyorSubsystem;
+    private IntakeSubsystem m_rollerSubsystem;
+    private IntakeConveyorSubsystem m_conveyorSubsystem;
     private DigitalInput m_intakeSwitch;
 
     private boolean didContact;
     private double intakePower;
 
     //constructor
-    public TestAutoIntakeCommand(RollerIntakeSubsystem rollerIntakeSubsystem, ConveyorSubsystem conveyorSubsystem, DigitalInput limitSwitch, double intakePower) {
+    public AutoIntakeCommand(IntakeSubsystem rollerIntakeSubsystem, IntakeConveyorSubsystem conveyorSubsystem, DigitalInput limitSwitch, double intakePower) {
         //sets the condition to false everytime the command is ran
         didContact = false;
         this.intakePower = intakePower;
