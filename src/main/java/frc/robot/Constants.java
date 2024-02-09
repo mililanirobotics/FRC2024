@@ -128,51 +128,6 @@ public final class Constants {
     );
   }
 
-  //constants for auto paths
-  public static class AutoConstants {
-    //auto constraints 
-    public static final double kAutoDriveMaxMetersPerSecond = 0.5;
-    public static final double kAutoDriveMaxAcceleration = kAutoDriveMaxMetersPerSecond;
-    public static final double kAutoDriveMaxRadiansPerSecond = 5.24;
-    public static final double kAutoDriveMaxAngularAcceleration = kAutoDriveMaxRadiansPerSecond;
-
-    //PID Constants
-    public static final double kPController = 0.5;
-    public static final double kIController = 0;
-    public static final double kDController = 0.0;
-
-    public static final double kPThetaController = 0.5;
-    public static final double kIThetaController = 0;
-    public static final double kDThetaController = 0;
-
-
-    //path planner constraint 
-    public static final PathConstraints pathConstraints = new PathConstraints(
-      kAutoDriveMaxMetersPerSecond, 
-      kAutoDriveMaxAcceleration, 
-      kAutoDriveMaxRadiansPerSecond, 
-      kAutoDriveMaxAngularAcceleration
-    );
-    
-    //max module speed
-    public static final double kMaxModuleSpeed = 4.5;
-
-    //Path planner config
-    public static final HolonomicPathFollowerConfig pathFollowingConfig = new HolonomicPathFollowerConfig(
-      new PIDConstants(kPController, kIController, kDController),
-      new PIDConstants(kPThetaController, kIThetaController, kDThetaController),
-      kMaxModuleSpeed, 
-      SwerveModuleConstants.leftFrontLocation.getNorm(),
-      new ReplanningConfig()
-    );
-
-    //path phases
-    // public static final Command startToAmp = AutoBuilder.pathfindToPose(
-    //   new Pose2d(14, 6.5, Rotation2d.fromDegrees(0)),
-    //   pathConstraints
-    // );
-  }
-
   //constants for the conveyor payload
   public static class ConveyorIntakeConstants {
     //ports and directionality of conveyors
@@ -185,9 +140,8 @@ public final class Constants {
     public static final double kConveyorDeadband = 0.05;
 
     //IR sensor
-    public static final int kConveyorIRSensorPort = 0;
-    public static final int kIntakeIRSensorPort = 1;
-
+    public static final int kStartIntakeConveyorSensorPort = 0;
+    public static final int kStopIntakeConveyorSensorPort = 1;
   }
 
   //constants for the scoring payload
@@ -199,17 +153,25 @@ public final class Constants {
     public static final boolean kLowerFlywheelReverse = true; 
     public static final int kScoringSensorPort = 1;
 
-    public static final double topRollerSpeed = 1;
-    public static final double botRollerSpeed = 0.3;
+    public static final double kTopRollerSpeed = 1;
+    public static final double kBotRollerSpeed = 0.3;
   }
 
   //constants for the limelight
-  public final class LimeLightConstants {
+  public static class LimeLightConstants {
     public static final double kMountHeight = 0; //Placeholder
     public static final double kMountAngle = 0; //Placeholder
 
     public static final double kTargetAMPHeight = 52.25; // Height of the center of the AMP's AprilTag from the ground 
   }
+
+  //constants for the extension
+  public static class ExtensionConstants {
+    public static final int kLeftExtensionForwardChannel = 1;
+    public static final int kLeftExtensionReverseChannel = 2;
+    public static final int kRightExtensionForwardChannel = 3;
+    public static final int kRightExtensionReverseChannel = 4;
+  } 
 
   //joystick constants and buttons
   public static class JoystickConstants {
@@ -238,11 +200,13 @@ public final class Constants {
     //joystick port for the gamepad
     public final static int kPrimaryLeftStickPort = 0;
     public final static int kPrimaryRightStickPort = 1;
-    public final static int kSecondaryPort = 1;
 
     //Dpad values
     public final static int kDpadUp = 0;
     public final static int kDpadDown = 180;
+
+    public final static double kDeadzone = 0.1;
+
   }
 
   public static class DriveConstants {
@@ -253,5 +217,50 @@ public final class Constants {
 
     public static final double kTeleDriveMaxAcceleration = kDriveMaxMetersPerSecond * 2;
     public static final double kTeleRotationMaxAngularAcceleration = kRotationMaxRadiansPerSecond;
+  }
+
+  //constants for auto paths
+  public static class AutoConstants {
+    //auto constraints 
+    public static final double kAutoDriveMaxMetersPerSecond = 0.5;
+    public static final double kAutoDriveMaxAcceleration = kAutoDriveMaxMetersPerSecond;
+    public static final double kAutoDriveMaxRadiansPerSecond = 5.24;
+    public static final double kAutoDriveMaxAngularAcceleration = kAutoDriveMaxRadiansPerSecond;
+
+    //PID Constants
+    public static final double kPController = 0.5;
+    public static final double kIController = 0;
+    public static final double kDController = 0.0;
+
+    public static final double kPThetaController = 0.5;
+    public static final double kIThetaController = 0;
+    public static final double kDThetaController = 0;
+
+
+    //path planner constraint 
+    public static final PathConstraints pathConstraints = new PathConstraints(
+      kAutoDriveMaxMetersPerSecond, 
+      kAutoDriveMaxAcceleration, 
+      kAutoDriveMaxRadiansPerSecond, 
+      kAutoDriveMaxAngularAcceleration
+    );
+    
+    //max module speed
+    public static final double kMaxModuleSpeed = 3;
+
+    //Path planner config
+    public static final HolonomicPathFollowerConfig pathFollowingConfig = new HolonomicPathFollowerConfig(
+      new PIDConstants(kPController, kIController, kDController),
+      new PIDConstants(kPThetaController, kIThetaController, kDThetaController),
+      kMaxModuleSpeed, 
+      SwerveModuleConstants.leftFrontLocation.getNorm(),
+      new ReplanningConfig()
+    );
+
+    //path phases
+    // public static final Command startToAmp = AutoBuilder.pathfindToPose(
+    //   new Pose2d(14, 6.5, Rotation2d.fromDegrees(0)),
+    //   pathConstraints
+    // );
   }
 }

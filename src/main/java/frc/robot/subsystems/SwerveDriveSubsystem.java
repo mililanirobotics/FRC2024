@@ -1,10 +1,9 @@
 package frc.robot.subsystems;
-
-import com.kauailabs.navx.frc.AHRS;
-// import com.pathplanner.lib.auto.AutoBuilder;
-// import com.pathplanner.lib.util.PathPlannerLogging;
-
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.DriverStation;
+//general imports
 import edu.wpi.first.wpilibj.SPI;
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,27 +14,31 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-// import frc.robot.Constants.AutoConstants;
+//path planner
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.PathPlannerLogging;
+//constants
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 
 public class SwerveDriveSubsystem extends SubsystemBase {
-
+    //Swerve modules
     private SwerveModule leftFrontModule;
     private SwerveModule rightFrontModule;
     private SwerveModule leftBackModule;
     private SwerveModule rightBackModule;
+    //array of modules; used to get states later
     private SwerveModule[] modules;
-
+    //Navx and odometry
     private AHRS navX;
-
     private SwerveDriveOdometry odometry;
-
+    //Field2d 
     private Field2d field = new Field2d();
 
+    //constructor
     public SwerveDriveSubsystem() {
-        // Front Left Module Initializing
+        //Front Left Module Initializing
         leftFrontModule = new SwerveModule(
             SwerveModuleConstants.kLeftFrontWheelPort, 
             SwerveModuleConstants.kLeftFrontRotationPort, 
@@ -46,7 +49,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kLeftFrontCANCoderReversed
         );
 
-        // Front Right Module Initializing
+        //Front Right Module Initializing
         rightFrontModule = new SwerveModule(
             SwerveModuleConstants.kRightFrontWheelPort, 
             SwerveModuleConstants.kRightFrontRotationPort, 
@@ -57,6 +60,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kRightFrontCANCoderReversed
         );
 
+        //Back Left Module Initializing
         leftBackModule = new SwerveModule(
             SwerveModuleConstants.kLeftBackWheelPort, 
             SwerveModuleConstants.kLeftBackRotationPort, 
@@ -67,6 +71,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kLeftBackCANCoderReversed
         );
 
+        //Back Right Module Initializing
         rightBackModule = new SwerveModule(
             SwerveModuleConstants.kRightBackWheelPort, 
             SwerveModuleConstants.kRightBackRotationPort, 
@@ -78,48 +83,49 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kRightBackCANCoderReversed
         );
 
+        //adding modules to the array
         modules = new SwerveModule[] {
             leftBackModule, rightBackModule, leftFrontModule, leftBackModule
         };
 
+        //initializing and resetting Navx
         navX = new AHRS(SPI.Port.kMXP);
         navX.enableLogging(true);
         navX.reset();
 
+        //initializing odometry that uses continuous 360 degree input
         odometry = new SwerveDriveOdometry(
             SwerveModuleConstants.kinematics, 
-            getRotation2dContinuous(),
+            getRotation2dDegContinuous(),
             getModulePosition()
         );
 
-        // AutoBuilder.configureHolonomic(
-        //     this::getPose, 
-        //     this::resetOdometry, 
-        //     this::getSpeeds, 
-        //     this::driveRobotRelative, 
-        //     AutoConstants.pathFollowingConfig, 
-        //     () -> {
-        //         var alliance = DriverStation.getAlliance();
-        //         if(alliance.isPresent()) { 
-        //             return alliance.get() == DriverStation.Alliance.Red;
-        //         }
-        //         return false;
-        //     },
-        //     this
-        // );
+        //initializing AutoBuilder to create path planner autopaths
+        //flips the created autopath if on the Red Alliance
+        AutoBuilder.configureHolonomic(
+            this::getPose, 
+            this::resetOdometry, 
+            this::getSpeeds, 
+            this::driveRobotRelative, 
+            AutoConstants.pathFollowingConfig, 
+            () -> {
+                var alliance = DriverStation.getAlliance();
+                if(alliance.isPresent()) { 
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
+            },
+            this
+        );
 
-        // PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
-        // field.setRobotPose(getPose());
+        //tracks where robot is on the field
+        PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
+        field.setRobotPose(getPose());
     }
 
     //=========================================================================== 
     // gyro and accelorometer methods
     //===========================================================================
-
-    // //calibrates the gyro
-    // public void calibrateGyro() {
-    //     navX.calibrate();
-    // }
 
     /**
      * Resets the current angle of the gyro to 0. 
@@ -132,73 +138,100 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     /**
      * Gets the current yaw angle from the navx gyro
-    */
+     * @return The yaw value recorded
+     */
     public double getYaw() {
         return navX.getYaw();
     }
 
     /**
      * Gets the current pitch angle from the navx gyro
-    */
+     * @return The pitch value recorded
+     */
     public double getPitch() {
         return navX.getPitch();
     }
 
     /**
      * Gets the current roll angle from the navx gyro
-    */
+     * @return The roll value recorded
+     */
     public double getRoll() {
         return navX.getRoll();
     }
 
     /**
-     * Gets the rotation of the robot from a top down perspective
+     * Returns a Rotation2d object from a continuous 0-360 degree rotation
+     * @return The continuous degree Rotation2d object
      */
-    public Rotation2d getRotation2dContinuous() {
+    public Rotation2d getRotation2dDegContinuous() {
         return Rotation2d.fromDegrees(getDegrees());
     }
 
     /**
-     * Gets the rotation of the robot from a top down perspective
+     * Returns a Rotation2d object from a continuous 0-2π degree rotation
+     * @return The continuous radian Rotation2d object
      */
-    public Rotation2d getRotation2dCWP() {
-        return Rotation2d.fromDegrees(getDegreesCWP());
+    public Rotation2d getRotation2dRadContinuous() {
+        return Rotation2d.fromRadians(getRad());
     }
 
-    public Rotation2d getRotation2dRad() {
+    /**
+     * Returns a Rotation2d object from a -180 to 180 degree rotation
+     * @return The degree Rotation2d object
+     */
+    public Rotation2d getRotation2dDeg() {
         return Rotation2d.fromDegrees(getYaw());
     }
 
+    /**
+     * Returns a Rotation2d object from -π to π radian rotation
+     * @return The radian Rotation2d object
+     */
+    public Rotation2d getRotation2dRad() {
+        return Rotation2d.fromRadians(Units.degreesToRadians(getYaw()));
+    }
+
+    /**
+     * Returns the yaw value of the Navx assuming CCW pos and continuous (in degrees)
+     * @return The adjusted degrees
+     */
     public double getDegrees() {
         double rawDegrees = -getYaw();
         return rawDegrees < 0 ? rawDegrees + 360 : rawDegrees;
     }
 
+    /**
+     * Returns the yaw value of the Navx assuming CCW pos and continuous (in radians)
+     * @return The adjusted radians
+     */
     public double getRad() {
-        double rad = Units.degreesToRadians(-getYaw()) % (2 * Math.PI);
+        double rad = Units.degreesToRadians(-getYaw());
         return rad < 0 ? rad + 2 * Math.PI : rad;
     }
 
-    public double getDegreesCWP() {
-        double rawDegrees = getYaw() % 360;
-        return rawDegrees < 0 ? rawDegrees + 360 : rawDegrees;
-    }
+    //=========================================================================== 
+    // drive methods
+    //===========================================================================
 
-    public void shutdown() {
-        leftFrontModule.shutdown();
-        rightFrontModule.shutdown();
-        leftBackModule.shutdown();
-        rightBackModule.shutdown();
-    }
-
+    /**
+     * Sets the desired states for the swere modules; modules will automatically go to the desired states
+     * @param desiredStates The desired states from the ChassisSpeeds object
+     */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
+        //sets drive constants to the states
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kDriveMaxMetersPerSecond);
+        //sets the states
         leftFrontModule.setSwerveState(desiredStates[0]);
         rightFrontModule.setSwerveState(desiredStates[1]);
         leftBackModule.setSwerveState(desiredStates[2]);
         rightBackModule.setSwerveState(desiredStates[3]);
     }
 
+    /**
+     * Returns the current swerve module states
+     * @return An array of the current swerve module states
+     */
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
 
@@ -209,16 +242,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         return states;
     }
 
-    public void getCANCoderReading() {
-        SmartDashboard.putNumber("Left Front: ", leftFrontModule.getCANCoderReading());
-        SmartDashboard.putNumber("Right Front: ", rightFrontModule.getCANCoderReading());
-        SmartDashboard.putNumber("Left Back: ", leftBackModule.getCANCoderReading());
-        SmartDashboard.putNumber("Right Back: ", rightBackModule.getCANCoderReading());
-        SmartDashboard.updateValues();
-    }
-
     /**
-     * Returns the current position of the module (displacement)
+    * Returns the current position of the module (displacement)
     * @return The current displacement of the module
     */
     public SwerveModulePosition[] getModulePosition() {
@@ -238,32 +263,76 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         };
     }
 
+    /**
+     * Returns a robot oriented ChassisSpeed object
+     * @return The robot oriented ChassisSpeed object
+     */
     public ChassisSpeeds getSpeeds() {
         return SwerveModuleConstants.kinematics.toChassisSpeeds(getModuleStates());
     }
 
+    /**
+     * Sets the swerve states to robot relative control
+     * @param robotRelativeSpeed The robot relative ChassisSpeed object
+     */
     public void driveRobotRelative(ChassisSpeeds robotRelativeSpeed) {
-        ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeed, 0.02);    
+        ChassisSpeeds targetSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeed, getRotation2dDeg());
+        targetSpeeds = ChassisSpeeds.discretize(targetSpeeds, 0.02);    
 
         SwerveModuleState[] targetState = SwerveModuleConstants.kinematics.toSwerveModuleStates(targetSpeeds);
         setModuleStates(targetState);
     }
 
+    /**
+     * Sets the power of the conveyor motors to 0
+     */
+    public void shutdown() {
+        leftFrontModule.shutdown();
+        rightFrontModule.shutdown();
+        leftBackModule.shutdown();
+        rightBackModule.shutdown();
+    }
+
+    //=========================================================================== 
+    // misc methods
+    //===========================================================================
+    
+    /**
+     * Returns the recorded odometry position of the robot on the field 
+     * @return
+     */
     public Pose2d getPose() {
         return odometry.getPoseMeters();
     }
 
+    /**
+     * Resets the odometry object; sets its position based on the robot's current rotation and position
+     * @param pose The current position of the robot
+     */
     public void resetOdometry(Pose2d pose) {
-        odometry.resetPosition(getRotation2dContinuous(), getModulePosition(), pose);
+        odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePosition(), pose);
+    }
+
+    /**
+     * Prints the CANCoder readings to SmartDashboard
+     */
+    public void getCANCoderReading() {
+        SmartDashboard.putNumber("Left Front: ", leftFrontModule.getCANCoderReading());
+        SmartDashboard.putNumber("Right Front: ", rightFrontModule.getCANCoderReading());
+        SmartDashboard.putNumber("Left Back: ", leftBackModule.getCANCoderReading());
+        SmartDashboard.putNumber("Right Back: ", rightBackModule.getCANCoderReading());
+        SmartDashboard.updateValues();
     }
 
     @Override
     public void periodic() {
+        //updates odometry
         odometry.update(
-            getRotation2dContinuous(),
+            Rotation2d.fromDegrees(getYaw()),
             getModulePosition()
         );
 
+        //puts info on SmartDashboard
         SmartDashboard.putNumber("Robot Heading", getDegrees());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
     }

@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+//general imports
 import java.lang.Math;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -12,6 +13,7 @@ import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+//constants
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 
@@ -133,15 +135,6 @@ public class SwerveModule {
         driveEncoder.setPosition(0);
         rotationEncoder.setPosition(getCANCoderReading());
     }
-
-    /**
-     * Returns the current state of the swerve drive module (velocity and turn angle)
-     * Optimizes the module's path to a given setpoint
-     * @return Swerve module state object with the module's current position and 
-     */
-    // public SwerveModuleState getModuleState() {
-    //     return new SwerveModuleState(getDriveVelocity(), new Rotation2d(getRotationPosition()));
-    // }
 
     public SwerveModuleState getModuleState() {
         return new SwerveModuleState(getDriveVelocity(), Rotation2d.fromRadians(getRotationPosition()));

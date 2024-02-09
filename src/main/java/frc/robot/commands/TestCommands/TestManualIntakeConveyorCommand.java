@@ -7,23 +7,23 @@ import edu.wpi.first.wpilibj2.command.Command;
 //general imports
 import frc.robot.Constants.JoystickConstants;
 
-public class TestManualConveyorCommand extends Command {
+public class TestManualIntakeConveyorCommand extends Command {
     //declaring subsystems
-    private IntakeConveyorSubsystem m_conveyorSubsystem;
+    private IntakeConveyorSubsystem m_intakeConveyorSubsystem;
 
     //declaring the joystick used
     private GenericHID joystick;
 
     //speed of the conveyor
-    private double conveyorSpeed;
+    private double intakeConveyorSpeed;
 
     //constructor
-    public TestManualConveyorCommand(GenericHID joystick, IntakeConveyorSubsystem conveyorSubsystem) {
+    public TestManualIntakeConveyorCommand(GenericHID joystick, IntakeConveyorSubsystem intakeConveyorSubsystem) {
         this.joystick = joystick;
-        m_conveyorSubsystem = conveyorSubsystem;
-        conveyorSpeed = 0;
+        m_intakeConveyorSubsystem = intakeConveyorSubsystem;
+        intakeConveyorSpeed = 0;
 
-        addRequirements(m_conveyorSubsystem);
+        addRequirements(m_intakeConveyorSubsystem);
     }
     
     @Override
@@ -31,37 +31,35 @@ public class TestManualConveyorCommand extends Command {
         //sets the conveyor speed based on the secondary gamepad's left joystick value
         if(joystick.getRawButtonPressed(JoystickConstants.kAButtonPort)     
         ) {
-            conveyorSpeed += 0.1;
+            intakeConveyorSpeed += 0.1;
         }
         else if(joystick.getRawButtonPressed(JoystickConstants.kBButtonPort)
         ) {
-            conveyorSpeed += 0.05;
+            intakeConveyorSpeed += 0.05;
         }
         else if(joystick.getRawButtonPressed(JoystickConstants.kXButtonPort)) {
-            conveyorSpeed -= 0.1;
+            intakeConveyorSpeed -= 0.1;
         }
         else if(joystick.getRawButtonPressed(JoystickConstants.kYButtonPort)) {
-            conveyorSpeed -= 0.05;
+            intakeConveyorSpeed -= 0.05;
         }
         else if(joystick.getRawButtonPressed(JoystickConstants.kBackButtonPort)) {
-            conveyorSpeed = 0;
+            intakeConveyorSpeed = 0;
         }
 
         //sets the speeds
         if(joystick.getRawButtonPressed(JoystickConstants.kStartButtonPort)) {
-            m_conveyorSubsystem.setConveyorSpeed(conveyorSpeed);
+            m_intakeConveyorSubsystem.setSpeeds(intakeConveyorSpeed);
         }
-        
-        // conveyorSpeed = joystick.getRawAxis(JoystickConstants.kRightYJoystickPort);
-        // m_conveyorSubsystem.setConveyorSpeed(conveyorSpeed);f
 
-        SmartDashboard.putNumber("Conveyor Speed", conveyorSpeed);
+        //puts speeds on SmartDashboard
+        SmartDashboard.putNumber("Conveyor and Intake Speed", intakeConveyorSpeed);
         SmartDashboard.updateValues();
     }
 
     @Override
     public void end(boolean interrupted) {
-        m_conveyorSubsystem.shutdown();
+        m_intakeConveyorSubsystem.shutdown();
     }
 
     //in progress
