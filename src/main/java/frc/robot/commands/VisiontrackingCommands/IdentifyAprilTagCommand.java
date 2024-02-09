@@ -12,8 +12,6 @@ public class IdentifyAprilTagCommand extends Command{
     // Declaring Subsystems
     private AprilTagsSubsystem m_AprilTagsSubsystem;
 
-
-
     public IdentifyAprilTagCommand(AprilTagsSubsystem aprilTagsSubsystem) {
         m_AprilTagsSubsystem = aprilTagsSubsystem;
     }
@@ -25,6 +23,6 @@ public class IdentifyAprilTagCommand extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("Target is found lmao");
+        System.out.println("Target is found");
     }
 }

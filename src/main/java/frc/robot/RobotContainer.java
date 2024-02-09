@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.subsystems.AprilTagsSubsystem;
-import frc.robot.subsystems.ConveyorSubsystem;
 import frc.robot.subsystems.AprilTagsSubsystem.Pipeline;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -38,7 +37,6 @@ public class RobotContainer {
   //initializing subsystems
   private final AprilTagsSubsystem aprilTagsSubsystem = new AprilTagsSubsystem();
   private final IntakeRollerSubsystem intakeRollerSubsystem = new IntakeRollerSubsystem();
-  private final ConveyorSubsystem conveyorSubsystem = new ConveyorSubsystem();
   private final ScoringSubsystem scoringSubsytem = new ScoringSubsystem();
   private final SwerveDriveSubsystem swerveDriveSubsystem = new SwerveDriveSubsystem();
 
@@ -96,7 +94,7 @@ public class RobotContainer {
    */
   public Command IntakeToScoringCommand() {
     return new SequentialCommandGroup(
-      new AutoIntakeCommand(intakeRollerSubsystem, conveyorSubsystem, intakeLimitSwitch, 1)
+      new AutoIntakeCommand(intakeRollerSubsystem, intakeLimitSwitch, 1)
     );
       // new SequentialCommandGroup(
       //   new AutoIntakeCommand(IntakeRollerSubsystem, conveyorSubsystem, intakeLimitSwitch, 1),

@@ -9,6 +9,8 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
+
+import edu.wpi.first.math.controller.PIDController;
 //swerve drive
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -151,6 +153,7 @@ public final class Constants {
     public static final double kPController = 0.5;
     public static final double kIController = 0;
     public static final double kDController = 0.0;
+    public static final double kTolerance = 2;
 
     public static final double kPThetaController = 0.5;
     public static final double kIThetaController = 0;
