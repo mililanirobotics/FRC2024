@@ -8,12 +8,13 @@
 //     //declaring subsystems
 //     private ScoringSubsystem m_scoringSubsystem;
 //     //declaring variables
-//     private boolean didContact;
+//     private boolean passedFront;
+//     private boolean passedBack;
+//     private boolean seenMiddle;
 
 //     //constructor
 //     public AutoScoringCommand(ScoringSubsystem scoringSubsystem) {
 //         //sets the condition to false everytime the command is ran
-//         didContact = false;
 //         //initializing subsystems
 //         m_scoringSubsystem = scoringSubsystem;
 //         addRequirements(m_scoringSubsystem);
@@ -21,6 +22,9 @@
     
 //     @Override
 //     public void initialize() {
+//         passedFront = false;
+//         passedBack = false;
+//         seenMiddle = false;
 //         System.out.println("Scoring command started");
 //         m_scoringSubsystem.setSpeed(ScoringConstants.kBotRollerSpeed, ScoringConstants.kTopRollerSpeed);
 //     }
@@ -28,9 +32,19 @@
 //     @Override
 //     public void execute() {
 //         //updates the boolean once the IR sensor is triggered
-//         if(m_scoringSubsystem.getStopSensorReading()) {
-//             didContact = true;
+//         if(!m_scoringSubsystem.getStopSensorReading()) {
+//             passedFront = true;
 //         }
+//         if (passedFront && m_scoringSubsystem.getStopSensorReading()) {
+//             seenMiddle = true;
+//         }
+//         if(passedFront && seenMiddle && !m_scoringSubsystem.getStopSensorReading()) {
+//             passedBack = true;
+//         }
+//         System.out.println("Sensor Reading: "+m_scoringSubsystem.getStopSensorReading());
+//         System.out.println("Passed Front: "+passedFront);
+//         System.out.println("Passed Middle: "+seenMiddle);
+//         System.out.println("Passed Back: "+passedBack);
 //     }
 
 //     @Override
@@ -42,6 +56,6 @@
 //     @Override
 //     public boolean isFinished() {
 //         //stops the command once the note has fully passed the IR sensor
-//         return didContact && !m_scoringSubsystem.getStopSensorReading();
+//         return passedBack && m_scoringSubsystem.getStopSensorReading();
 //     }
 // }

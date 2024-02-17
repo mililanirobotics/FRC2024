@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 //constants
-import frc.robot.Constants.ConveyorIntakeConstants;
+import frc.robot.Constants.IntakeConveyorConstants;
 
 public class IntakeConveyorSubsystem extends SubsystemBase {
   //motor controllers
@@ -16,21 +16,21 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
   //IR sensors
   // private DigitalInput startIntakeConveyorSensor;
   // private DigitalInput stopIntakeConveyorSensor;
-  //
+  
   private boolean inScorer;
 
   //constructor
   public IntakeConveyorSubsystem() {
     //initializing motor controllers
-    leftConveyorTopRoller = new CANSparkMax(ConveyorIntakeConstants.kLeftConveyorTopRollerPort, MotorType.kBrushless);
-    rightConveyorBottomRoller = new CANSparkMax(ConveyorIntakeConstants.kRightConveyorBottomRollerPort, MotorType.kBrushless);
+    leftConveyorTopRoller = new CANSparkMax(IntakeConveyorConstants.kLeftConveyorTopRollerPort, MotorType.kBrushless);
+    rightConveyorBottomRoller = new CANSparkMax(IntakeConveyorConstants.kRightConveyorBottomRollerPort, MotorType.kBrushless);
     //setting directionality 
-    leftConveyorTopRoller.setInverted(ConveyorIntakeConstants.kLeftConveyorTopRollerReverse);
-    rightConveyorBottomRoller.setInverted(ConveyorIntakeConstants.kRightConveyorBottomRollerReverse);
+    leftConveyorTopRoller.setInverted(IntakeConveyorConstants.kLeftConveyorTopRollerReverse);
+    rightConveyorBottomRoller.setInverted(IntakeConveyorConstants.kRightConveyorBottomRollerReverse);
     //IR sensors
-    // startIntakeConveyorSensor = new DigitalInput(ConveyorIntakeConstants.kStartIntakeConveyorSensorPort);
-    // stopIntakeConveyorSensor = new DigitalInput(ConveyorIntakeConstants.kStopIntakeConveyorSensorPort);
-    //
+    // startIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStartIntakeConveyorSensorPort);
+    // stopIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStopIntakeConveyorSensorPort);
+    
     inScorer = false;
   }
 

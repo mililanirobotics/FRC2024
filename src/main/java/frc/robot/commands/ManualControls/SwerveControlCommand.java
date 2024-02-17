@@ -52,6 +52,7 @@ public class SwerveControlCommand extends Command{
         // Apply Deadband to prevent motors accidentally spinning
         xSpeed = Math.abs(xSpeed) > JoystickConstants.kDeadzone ? xSpeed : 0.0;
         ySpeed = Math.abs(ySpeed) > JoystickConstants.kDeadzone ? ySpeed : 0.0; 
+        turningSpeed = Math.abs(turningSpeed) > JoystickConstants.kDeadzone ? turningSpeed : 0.0;
 
         //Limiting Drive Speeds Acceleration to be linear
 

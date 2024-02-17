@@ -34,7 +34,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     private AHRS navX;
     private SwerveDriveOdometry odometry;
     //Field2d 
-    private Field2d field = new Field2d();
+    private Field2d field;
 
     //constructor
     public SwerveDriveSubsystem() {
@@ -118,9 +118,31 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             this
         );
 
-        //tracks where robot is on the field
-        PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
-        field.setRobotPose(getPose());
+        //Path Planner logging
+        field = new Field2d();
+
+        //Logging callback for current robot pose
+        PathPlannerLogging.setLogCurrentPoseCallback(
+            (pose) -> {
+                field.setRobotPose(pose);
+            }
+        );
+
+        //Logging callback for target robot pose
+        PathPlannerLogging.setLogTargetPoseCallback(
+        (pose) -> {
+            field.getObject("target pose").setPose(pose);
+        }
+        );
+
+        //Logging callback for the active path, this is sent as a list of poses 
+        PathPlannerLogging.setLogActivePathCallback(
+        (poses) -> {
+            field.getObject("path").setPoses(poses);
+        }
+        );
+
+        SmartDashboard.putData("Field", field);
     }
 
     //=========================================================================== 
@@ -332,8 +354,33 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             getModulePosition()
         );
 
+        field.setRobotPose(odometry.getPoseMeters());
+
         //puts info on SmartDashboard
         SmartDashboard.putNumber("Robot Heading", getDegrees());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        SmartDashboard.putNumber("Translational Velocity", leftFrontModule.getDriveVelocity());
+
+        //path planner
+
+        PathPlannerLogging.setLogCurrentPoseCallback(
+            (pose) -> {
+                field.setRobotPose(pose);
+            }
+        );
+
+        //Logging callback for target robot pose
+        PathPlannerLogging.setLogTargetPoseCallback(
+            (pose) -> {
+                field.getObject("target pose").setPose(pose);
+            }
+        );
+
+        //Logging callback for the active path, this is sent as a list of poses 
+        PathPlannerLogging.setLogActivePathCallback(
+            (poses) -> {
+                field.getObject("path").setPoses(poses);
+            }
+        );
     }
 }

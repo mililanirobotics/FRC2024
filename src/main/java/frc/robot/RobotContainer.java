@@ -12,7 +12,6 @@ import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.commands.LowerExtensionCommand;
 import frc.robot.commands.RaiseExtensionCommand;
-// import frc.robot.commands.AutomationCommands.AutoIntakeConveyorCommand;
 // import frc.robot.commands.AutomationCommands.AutoScoringCommand;
 import frc.robot.commands.ManualControls.ManualIntakeConveyorCommand;
 import frc.robot.commands.ManualControls.ManualScoringCommand;
@@ -30,6 +29,8 @@ import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.PathPlannerLogging;
+
 //general imports
 import java.util.List;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -37,11 +38,11 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 //constants
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.JoystickConstants;
@@ -67,6 +68,9 @@ public class RobotContainer {
   //initializing sendable chooser for auto
   private SendableChooser<Command> autoCommand;
   private boolean isTesting = false; //purely for testing purposes
+
+  private final Field2d field = new Field2d();
+
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -106,9 +110,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     autoCommand.addOption("Ur Mom", new PathPlannerAuto("Ur Mom"));
-    autoCommand.addOption("Ur Mom X2", onTheFlyCommand(new Pose2d(0, 0, new Rotation2d()), new Pose2d(2, 0, new Rotation2d())));
+    autoCommand.addOption("Ur Mom X2", onTheFlyCommand(new Pose2d(0, 0, new Rotation2d()), new Pose2d(0, 0, Rotation2d.fromDegrees(90))));
 
-    //starts the auto-scoring command if the A button is pressed; stops if one of the conditions is met
+    // //starts the auto-scoring command if the A button is pressed; stops if one of the conditions is met
     // new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort).onTrue(
     //   new AutoScoringCommand(scoringSubsytem).until(
     //     () -> secondaryJoystick.getRawButton(JoystickConstants.kRightBumperPort)

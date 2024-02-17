@@ -129,7 +129,7 @@ public final class Constants {
   }
 
   //constants for the conveyor payload
-  public static class ConveyorIntakeConstants {
+  public static class IntakeConveyorConstants {
     //ports and directionality of conveyors
     public static final int kLeftConveyorTopRollerPort = 9;
     public static final int kRightConveyorBottomRollerPort = 8;
@@ -212,29 +212,29 @@ public final class Constants {
   public static class DriveConstants {
 
     // Drive Speed Constants
-    public static final double kDriveMaxMetersPerSecond = 1;
-    public static final double kRotationMaxRadiansPerSecond = 1.5;
+    public static final double kDriveMaxMetersPerSecond = 0.2;
+    public static final double kRotationMaxRadiansPerSecond = 1;
 
-    public static final double kTeleDriveMaxAcceleration = kDriveMaxMetersPerSecond * 2;
+    public static final double kTeleDriveMaxAcceleration = kDriveMaxMetersPerSecond;
     public static final double kTeleRotationMaxAngularAcceleration = kRotationMaxRadiansPerSecond;
   }
 
   //constants for auto paths
   public static class AutoConstants {
     //auto constraints 
-    public static final double kAutoDriveMaxMetersPerSecond = 0.5;
+    public static final double kAutoDriveMaxMetersPerSecond = 0.1;
     public static final double kAutoDriveMaxAcceleration = kAutoDriveMaxMetersPerSecond;
-    public static final double kAutoDriveMaxRadiansPerSecond = 5.24;
+    public static final double kAutoDriveMaxRadiansPerSecond = Math.PI;
     public static final double kAutoDriveMaxAngularAcceleration = kAutoDriveMaxRadiansPerSecond;
 
     //PID Constants
-    public static final double kPController = 0.5;
+    public static final double kPController = 5;
     public static final double kIController = 0;
-    public static final double kDController = 0.0;
+    public static final double kDController = 0.000;
 
-    public static final double kPThetaController = 0.5;
-    public static final double kIThetaController = 0;
-    public static final double kDThetaController = 0;
+    public static final double kPThetaController = 0.65; //1.7
+    public static final double kIThetaController = 0; 
+    public static final double kDThetaController = 0.00;
 
 
     //path planner constraint 
@@ -246,8 +246,8 @@ public final class Constants {
     );
     
     //max module speed
-    public static final double kMaxModuleSpeed = 3;
-
+    public static final double kMaxModuleSpeed = 0.4;
+ 
     //Path planner config
     public static final HolonomicPathFollowerConfig pathFollowingConfig = new HolonomicPathFollowerConfig(
       new PIDConstants(kPController, kIController, kDController),
@@ -257,10 +257,16 @@ public final class Constants {
       new ReplanningConfig()
     );
 
+
     //path phases
     // public static final Command startToAmp = AutoBuilder.pathfindToPose(
     //   new Pose2d(14, 6.5, Rotation2d.fromDegrees(0)),
     //   pathConstraints
     // );
+  }
+
+  public static class LEDConstants {
+    public static final int CANdleID = 30;
+    public static final int LEDcount = 308;
   }
 }
