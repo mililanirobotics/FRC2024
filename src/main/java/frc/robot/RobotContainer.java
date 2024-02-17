@@ -25,7 +25,7 @@ public class RobotContainer {
   private final AprilTagsSubsystem m_AprilTagsSubsystem = new AprilTagsSubsystem();
 
   // The Robot's commands are defined here
-  private final IdentifyAprilTagCommand identifyAprilTagCommand = new IdentifyAprilTagCommand();
+  private final IdentifyAprilTagCommand identifyAprilTagCommand = new IdentifyAprilTagCommand(m_AprilTagsSubsystem);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed (and port)
   private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kPrimaryPort);

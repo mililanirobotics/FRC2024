@@ -19,7 +19,7 @@ public final class Constants {
   }
 
   public final class LimeLightConstants {
-    public static final double kMountHeight = 0; //Placeholder
+    public static final double kMountHeight = 13; //Placeholder
     public static final double kMountAngle = 0; //Placeholder
 
     public static final double kTargetAMPHeight = 52.25; // Height of the center of the AMP's AprilTag from the ground 

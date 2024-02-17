@@ -1,19 +1,19 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTable;
-//constants
-import frc.robot.Constants; 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.NetworkTable; 
+
 
 
 public class AprilTagsSubsystem extends SubsystemBase{
     
     private NetworkTable table;
+    private PIDController TurningPID;
 
     public enum Pipeline {
-
         /**
          * Pipeline IDs are not set, thinking whether it matters if we need two pipelines for each AMP, driver view needs to be configured.
          */
@@ -29,6 +29,7 @@ public class AprilTagsSubsystem extends SubsystemBase{
     public AprilTagsSubsystem() {
         table = NetworkTableInstance.getDefault().getTable("limelight");
         setPipeline(Pipeline.DRIVER_VIEW);
+
     }
 
     /**
@@ -50,13 +51,14 @@ public class AprilTagsSubsystem extends SubsystemBase{
 
     /**
      * Returns the vertical offset from the crosshair to the target
-     * @return vertical offset from the target from -24.85 to +24.85
+     * @return vertical offset from the target from -24.85 to +24.85 degrees
      */
     public double getVerticalOffset() {
         double verticalOffset = table.getEntry("ty").getDouble(0);
         return verticalOffset;  
     }
 
+    
     /**
      * Sets the current pipeline on the limelight to the desired one
      * @param pipeline sets the limelight's current pipeline
@@ -65,4 +67,8 @@ public class AprilTagsSubsystem extends SubsystemBase{
         table.getEntry("pipeline").setValue(pipeline.PipelineID);
     }
 
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Horizontal Offset: ", getHorizontalOffset());
+    }
 }
