@@ -165,6 +165,14 @@ public final class Constants {
     public static final double kTargetAMPHeight = 52.25; // Height of the center of the AMP's AprilTag from the ground 
   }
 
+  public static class AprilTagConstants {
+    public static final double kPValue = 0.05;
+    public static final double kIValue = 0;
+    public static final double kDValue = 0;
+
+    public static final double kTolerance = 2; // Tolerance of 2 degree offset for alignment
+  }
+
   //constants for the extension
   public static class ExtensionConstants {
     public static final int kLeftExtensionForwardChannel = 1;
@@ -233,7 +241,7 @@ public final class Constants {
     public static final double kDController = 0.000;
 
     public static final double kPThetaController = 0.65; //1.7
-    public static final double kIThetaController = 0; 
+    public static final double kIThetaController = 0;
     public static final double kDThetaController = 0.00;
 
 
@@ -247,7 +255,7 @@ public final class Constants {
     
     //max module speed
     public static final double kMaxModuleSpeed = 0.4;
- 
+
     //Path planner config
     public static final HolonomicPathFollowerConfig pathFollowingConfig = new HolonomicPathFollowerConfig(
       new PIDConstants(kPController, kIController, kDController),

@@ -12,6 +12,7 @@ import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.commands.LowerExtensionCommand;
 import frc.robot.commands.RaiseExtensionCommand;
+// import frc.robot.commands.AutomationCommands.AutoIntakeConveyorCommand;
 // import frc.robot.commands.AutomationCommands.AutoScoringCommand;
 import frc.robot.commands.ManualControls.ManualIntakeConveyorCommand;
 import frc.robot.commands.ManualControls.ManualScoringCommand;
@@ -19,6 +20,7 @@ import frc.robot.commands.ManualControls.ManualScoringReverseCommand;
 import frc.robot.commands.ManualControls.SwerveControlCommand;
 import frc.robot.commands.TestCommands.TestManualIntakeConveyorCommand;
 import frc.robot.commands.TestCommands.TestManualScoringCommand;
+import frc.robot.commands.VisionCommands.AlignmentTurningCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -43,6 +45,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 //constants
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.JoystickConstants;
@@ -136,6 +139,12 @@ public class RobotContainer {
       new ManualIntakeConveyorCommand(secondaryJoystick, intakeConveyorSubsystem)
     );
     
+    new Trigger(
+      () -> secondaryJoystick.getRawButton(JoystickConstants.kLeftBumperPort)
+    ).onTrue(
+      new AlignmentTurningCommand(swerveDriveSubsystem, aprilTagsSubsystem)
+    );
+
     //manually controls the extensions with the left bumper and trigger
     new JoystickButton(secondaryJoystick, JoystickConstants.kLeftBumperPort).onTrue(
       new RaiseExtensionCommand(extensionSubsystem)
