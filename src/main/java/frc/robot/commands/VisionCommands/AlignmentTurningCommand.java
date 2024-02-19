@@ -6,7 +6,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AprilTagConstants;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.subsystems.AprilTagsSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
@@ -20,7 +19,7 @@ public class AlignmentTurningCommand extends Command{
     // Declared PID
     private PIDController AlignPID;
 
-    private double initialAngle;
+    private double turningSpeed;
     public double currentAngle;
 
     public AlignmentTurningCommand(SwerveDriveSubsystem swerveDriveSubsystem, AprilTagsSubsystem aprilTagsSubsystem) {
@@ -38,8 +37,7 @@ public class AlignmentTurningCommand extends Command{
 
     @Override
     public void initialize() {
-        initialAngle = Math.toRadians(m_AprilTagsSubsystem.getHorizontalOffset());
-        System.out.println("Initial Angle: "+initialAngle);
+
     }
 
     /*
@@ -49,11 +47,21 @@ public class AlignmentTurningCommand extends Command{
     public void execute () {
         currentAngle = Math.toRadians(m_AprilTagsSubsystem.getHorizontalOffset());
 
-        
-        ChassisSpeeds targetSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(0, 0, AlignPID.calculate(currentAngle, 0), new Rotation2d(0));
+        turningSpeed = AlignPID.calculate(currentAngle, 0) * (-3);
+
+        /*
+         * Minimal speed buffer for turning
+         */
+        if (Math.abs(turningSpeed) < 0.025) {
+            turningSpeed = Math.copySign(0.025, turningSpeed);
+        }
+
+        ChassisSpeeds targetSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(0, 0, turningSpeed, new Rotation2d(0));
 
         SwerveModuleState[] moduleStates = SwerveModuleConstants.kinematics.toSwerveModuleStates(targetSpeed);
         m_SwerveDriveSubsystem.setModuleStates(moduleStates);
+
+        System.out.println("Current Angle: " +currentAngle);
     }
 
 
@@ -64,6 +72,6 @@ public class AlignmentTurningCommand extends Command{
 
     @Override
     public boolean isFinished() {
-        return Math.abs(currentAngle - initialAngle) < 0.5;
+        return Math.abs(currentAngle) <= AprilTagConstants.kTolerance;
     }
 }

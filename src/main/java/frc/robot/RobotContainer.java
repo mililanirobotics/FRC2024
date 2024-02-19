@@ -65,7 +65,7 @@ public class RobotContainer {
   private final ExtensionSubsystem extensionSubsystem = new ExtensionSubsystem();
 
   //initailizing gamepads
-  private final GenericHID priamryJoystick = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
+  private final GenericHID primaryJoystick = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
   private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kSecondaryGamepadPort);
 
   //initializing sendable chooser for auto
@@ -86,7 +86,7 @@ public class RobotContainer {
     //setting the default command for the swerve drive
     swerveDriveSubsystem.setDefaultCommand(new SwerveControlCommand(
         swerveDriveSubsystem, 
-        priamryJoystick
+        primaryJoystick
       )
     );
     
@@ -140,7 +140,7 @@ public class RobotContainer {
     );
     
     new Trigger(
-      () -> secondaryJoystick.getRawButton(JoystickConstants.kLeftBumperPort)
+      () -> primaryJoystick.getRawButton(JoystickConstants.kLeftBumperPort)
     ).onTrue(
       new AlignmentTurningCommand(swerveDriveSubsystem, aprilTagsSubsystem)
     );

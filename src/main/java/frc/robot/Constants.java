@@ -168,9 +168,9 @@ public final class Constants {
   public static class AprilTagConstants {
     public static final double kPValue = 0.05;
     public static final double kIValue = 0;
-    public static final double kDValue = 0;
+    public static final double kDValue = 0.001;
 
-    public static final double kTolerance = 2; // Tolerance of 2 degree offset for alignment
+    public static final double kTolerance = 0.005; // Tolerance of 0.05 radian offset for alignment
   }
 
   //constants for the extension
