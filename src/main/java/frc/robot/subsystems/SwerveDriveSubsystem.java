@@ -6,9 +6,11 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,7 +19,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 //path planner
@@ -75,8 +76,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
     //gyro data
     private GenericEntry gyroData;
-    //PID Controller
-    private ProfiledPIDController anglePIDController;
 
     //constructor
     public SwerveDriveSubsystem(ShuffleboardTab testTranPos, ShuffleboardTab testTranVel, ShuffleboardTab testRotPos, 
@@ -94,7 +93,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kLeftFrontRotationReversed, 
             SwerveModuleConstants.kLeftFrontCANCoderPort, 
             SwerveModuleConstants.kLeftFrontCANCoderOffset, 
-            SwerveModuleConstants.kLeftFrontCANCoderReversed
+            SwerveModuleConstants.kLeftFrontCANCoderReversed,
+            SwerveModuleConstants.kLeftDriveCurrentLimit
         );
 
         //Front Right Module Initializing
@@ -105,7 +105,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kRightFrontRotationReversed, 
             SwerveModuleConstants.kRightFrontCANCoderPort, 
             SwerveModuleConstants.kRightFrontCANCoderOffset, 
-            SwerveModuleConstants.kRightFrontCANCoderReversed
+            SwerveModuleConstants.kRightFrontCANCoderReversed,
+            SwerveModuleConstants.kRightDriveCurrentLimit
         );
 
         //Back Left Module Initializing
@@ -116,7 +117,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kLeftBackRotationReversed, 
             SwerveModuleConstants.kLeftBackCANCoderPort, 
             SwerveModuleConstants.kLeftBackCANCoderOffset, 
-            SwerveModuleConstants.kLeftBackCANCoderReversed
+            SwerveModuleConstants.kLeftBackCANCoderReversed,
+            SwerveModuleConstants.kLeftDriveCurrentLimit
         );
 
         //Back Right Module Initializing
@@ -127,7 +129,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kRightBackRotationReversed, 
             SwerveModuleConstants.kRightBackCANCoderPort, 
             SwerveModuleConstants.kRightBackCANCoderOffset, 
-            SwerveModuleConstants.kRightBackCANCoderReversed
+            SwerveModuleConstants.kRightBackCANCoderReversed,
+            SwerveModuleConstants.kRightDriveCurrentLimit
         );
 
         //adding modules to the array
@@ -143,22 +146,18 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         //initializing odometry that uses continuous 360 degree input
         odometry = new SwerveDriveOdometry(
             SwerveModuleConstants.kinematics, 
-            Rotation2d.fromDegrees(getYaw()),
+            navX.getRotation2d(),
             getModulePosition()
         );
 
+        //reseting members
+        zeroOutGyro();
         resetOdometry(getPose());
+        resetOdometry(new Pose2d());
 
-        //PID controllers
-        anglePIDController = new ProfiledPIDController(
-            SwerveModuleConstants.kTurningP,
-            SwerveModuleConstants.kTurningI,
-            SwerveModuleConstants.kTurningD,
-            new TrapezoidProfile.Constraints(DriveConstants.kDriveMaxMetersPerSecond, DriveConstants.kTeleDriveMaxAcceleration) 
-        );
-
-        anglePIDController.enableContinuousInput(-Math.PI, Math.PI);
-        anglePIDController.setTolerance(1);
+        //tuning PID 
+        DriveConstants.thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        DriveConstants.thetaController.setTolerance(Units.degreesToRadians(10));
 
         //initializing AutoBuilder to create path planner autopaths
         //flips the created autopath if on the Red Alliance
@@ -259,6 +258,30 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     }
 
     /**
+     * Returns the angle of the gyro based on its current rotation 2D object (continuous)
+     * @return The angle reported by the gyro
+     */
+    public double getHeading() {
+        return navX.getRotation2d().getDegrees();
+    }
+
+    /**
+     * Returns the angular velocity of the rotation motors based on the NavX's reported rotation rate (deg/s)
+     * @return
+     */
+    public double getRotationRate() {
+        return -navX.getRate();
+    }
+
+    /**
+     * Returns a Rotation2D object based on the NavX's angle
+     * @return The rotation 2D object
+     */
+    public Rotation2d getRotation2d() {
+        return navX.getRotation2d();
+    }
+
+    /**
      * Returns a Rotation2d object from a continuous 0-360 degree rotation
      * @return The continuous degree Rotation2d object
      */
@@ -308,6 +331,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         return rad < 0 ? rad + 2 * Math.PI : rad;
     }
 
+    public double getAngleReference() {
+        return leftFrontModule.getRotationPosition();
+    }
+
     //=========================================================================== 
     // drive methods
     //===========================================================================
@@ -320,7 +347,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         //sets drive constants to the states
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kDriveMaxMetersPerSecond);
         //sets the states
-        leftFrontModule.setSwerveState(desiredStates[0], true);
+        leftFrontModule.setSwerveState(desiredStates[0], false);
         rightFrontModule.setSwerveState(desiredStates[1], false);
         leftBackModule.setSwerveState(desiredStates[2], false);
         rightBackModule.setSwerveState(desiredStates[3], false);
@@ -340,6 +367,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         return states;
     }
 
+    /**
+     * Returns an array of all the module states
+     * @return The array of module states
+     */
     public SwerveModule[] getModules() {
         return modules;
     }
@@ -391,6 +422,64 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         rightBackModule.shutdown();
     }
 
+    /**
+     * Resets the encoders of all the modules
+     * @param startT The translational defualt value of the drive encoder
+     * @param startR The rotational default value of the rotating encoder 
+     */
+    public void resetEncoders(double startT, double startR) {
+        leftFrontModule.resetEncoders(startT, startR);
+        leftBackModule.resetEncoders(startT, startR);
+        rightFrontModule.resetEncoders(startT, startR);
+        rightBackModule.resetEncoders(startT, startR);
+    }
+
+    /**
+     * Sets the mode of the modules to brake
+     */
+    public void setBrake() {
+        leftFrontModule.setBrake();
+        leftBackModule.setBrake();
+        rightFrontModule.setBrake();
+        rightBackModule.setBrake();
+    }
+
+    /**
+     * Sets the mode of the modules to coast
+     */
+    public void setCoast() {
+        leftFrontModule.setCoast();
+        leftBackModule.setCoast();
+        rightFrontModule.setCoast();
+        rightBackModule.setCoast();
+    }
+
+    /**
+     * Returns the average position reported by the four modules (meters)
+     * @return The average translational position of the four modules
+     */
+    public double getAvgEncoderTran() {
+        return (leftBackModule.getDrivePosition() + 
+            leftFrontModule.getDrivePosition() + 
+            rightBackModule.getDrivePosition() + 
+            rightFrontModule.getDrivePosition() /
+            4.0
+        );
+    }
+
+    /**
+     * Returns the average position reported by the four modules (radians)
+     * @return The average rotational position of the four modules
+     */
+    public double getAvgEncoderRot() {
+        return (leftBackModule.getRotationPosition() + 
+            leftFrontModule.getRotationPosition() + 
+            rightBackModule.getRotationPosition() + 
+            rightFrontModule.getRotationPosition() /
+            4.0
+        );
+    }
+
     //=========================================================================== 
     // misc methods
     //===========================================================================
@@ -427,13 +516,11 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      */
     public void resetOdometry(Pose2d pose) {
         //resets encoders
-        leftBackModule.resetEncoders();
-        leftFrontModule.resetEncoders();
-        rightBackModule.resetEncoders();
-        rightFrontModule.resetEncoders();
-        //odometry
+        resetEncoders(pose.getTranslation().getNorm(), pose.getRotation().getRadians());
+
+        //odometry 
         odometry.resetPosition(
-            Rotation2d.fromDegrees(pose.getRotation().getDegrees()),
+            navX.getRotation2d(),
             getModulePosition(), 
             pose
         );
@@ -461,7 +548,6 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         leftBackTranAmps.setDouble(pdh.getCurrent(SwerveModuleConstants.kLeftBackWheelPort));
         rightFrontTranAmps.setDouble(pdh.getCurrent(SwerveModuleConstants.kRightFrontWheelPort));
         rightBackTranAmps.setDouble(pdh.getCurrent(1));
-
         //translational velocity
         leftFrontTranVelWidget.setDouble(leftFrontModule.getDriveVelocity());
         leftBackTranVelWidget.setDouble(leftBackModule.getDriveVelocity());
@@ -477,18 +563,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         leftBackRotVelWidget.setDouble(leftBackModule.getRotationVelocity());
         rightFrontRotVelWidget.setDouble(rightFrontModule.getRotationVelocity());
         rightBackRotVelWidget.setDouble(rightBackModule.getRotationVelocity());
-        //odometry 
-        // odometryPos.setValue(odometry.getPoseMeters());
-        //gyro
-        gyroData.setValue(getYaw());
     }
 
     @Override
     public void periodic() {
         //updates odometry
         odometry.update(
-            Rotation2d.fromDegrees(getYaw()),
-            getModulePosition()
+            navX.getRotation2d(),
+            getModulePosition()        
         );
 
         //updates the robot's pose on the Field2d widget

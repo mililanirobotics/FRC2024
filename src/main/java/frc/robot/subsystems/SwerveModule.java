@@ -11,6 +11,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkRelativeEncoder;
+import com.revrobotics.CANSparkBase.IdleMode;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -35,11 +37,15 @@ public class SwerveModule {
     //determines if the module is straight
     private Trigger isReset;
 
+    //Experimental Drift Solution
+    private final int currentLimit;
+
     //constructor
     public SwerveModule(int drivePort, int rotationPort, boolean driveReversed, boolean rotationReversed,
-            int CANCoderPort, double CANCoderOffset, boolean CANCoderReversed) {
+            int CANCoderPort, double CANCoderOffset, boolean CANCoderReversed, int currentLimit) {
         //initializing absolute encoder parameters 
         this.CANCoderReversed = CANCoderReversed;
+        this.currentLimit = currentLimit;
         angleCANCoder = new CANcoder(CANCoderPort);
       
         // Configure the CANcoder for basic use
@@ -64,7 +70,7 @@ public class SwerveModule {
         
         //reseting faults 
         driveMotor.clearFaults();
-        driveMotor.setSmartCurrentLimit(SwerveModuleConstants.kDriveCurrentLimit);
+        driveMotor.setSmartCurrentLimit(currentLimit);
         rotationMotor.clearFaults();
         rotationMotor.setSmartCurrentLimit(SwerveModuleConstants.kRotationCurrentLimit);
         driveMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
@@ -86,7 +92,7 @@ public class SwerveModule {
         //calculates the least turning degrees to setpoint
         rotationPID.enableContinuousInput(-Math.PI, Math.PI);
 
-        resetEncoders();
+        resetEncoders(0, 0);
     }
 
     //=========================================================================== 
@@ -122,6 +128,10 @@ public class SwerveModule {
 
     public double getPower() {
         return driveMotor.getAppliedOutput();
+    }
+
+    public double getVoltage() {
+        return driveMotor.getBusVoltage();
     }
 
     /**
@@ -161,9 +171,9 @@ public class SwerveModule {
     /**
      * Resets the encoders to their default position
      */
-    public void resetEncoders() {
-        driveEncoder.setPosition(0);
-        rotationEncoder.setPosition(getCANCoderReading());
+    public void resetEncoders(double tValue, double rValue) {
+        driveEncoder.setPosition(tValue);
+        rotationEncoder.setPosition(getCANCoderReading() + rValue);
     }
 
     public boolean isReset() {
@@ -181,6 +191,22 @@ public class SwerveModule {
     public void shutdown() {
         driveMotor.set(0);
         rotationMotor.set(0);
+    }
+
+    /**
+     * 
+     */
+    public void setBrake() {
+        driveMotor.setIdleMode(IdleMode.kBrake);
+        rotationMotor.setIdleMode(IdleMode.kBrake);
+    }
+     
+    /**
+     * 
+     */
+    public void setCoast() {
+        driveMotor.setIdleMode(IdleMode.kCoast);
+        rotationMotor.setIdleMode(IdleMode.kCoast);
     }
 
     /**
@@ -211,15 +237,14 @@ public class SwerveModule {
         
         if(needsAdjustment) {
             currentState = SwerveModuleState.optimize(currentState, getModuleState().angle);
-            driveMotor.set(currentState.speedMetersPerSecond * 1.1 / DriveConstants.kDriveMaxMetersPerSecond);
-            rotationMotor.set(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()));
+            driveMotor.setVoltage(currentState.speedMetersPerSecond * 1.1 / DriveConstants.kDriveMaxMetersPerSecond * 12);
+            rotationMotor.setVoltage(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()) * 12);
         }
         else {
             currentState = SwerveModuleState.optimize(currentState, getModuleState().angle);
-            driveMotor.set(currentState.speedMetersPerSecond / DriveConstants.kDriveMaxMetersPerSecond);
-            rotationMotor.set(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()));
+            driveMotor.setVoltage(currentState.speedMetersPerSecond / DriveConstants.kDriveMaxMetersPerSecond * 12);
+            rotationMotor.setVoltage(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()) * 12);
         }
-        
     }
 }
 
