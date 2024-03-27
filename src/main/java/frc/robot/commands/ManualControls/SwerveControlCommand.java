@@ -22,11 +22,13 @@ public class SwerveControlCommand extends Command{
     // SlewRateLimiter limits the rate of acceleration to be gradual and linear
     private SlewRateLimiter xLimiter, yLimiter, turningLimiter;
     
-    private GenericHID gamepad;
+    private GenericHID joystickL;
+    private GenericHID joystickR;
 
-    public SwerveControlCommand(SwerveDriveSubsystem swerveDriveSubsystem, GenericHID gamepad) {
+    public SwerveControlCommand(SwerveDriveSubsystem swerveDriveSubsystem, GenericHID joystickL, GenericHID joystickR) {
         m_SwerveDriveSubsystem = swerveDriveSubsystem;
-        this.gamepad = gamepad;
+        this.joystickL = joystickL;
+        this.joystickR = joystickR;
 
         this.xLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAcceleration);
         this.yLimiter = new SlewRateLimiter(DriveConstants.kTeleDriveMaxAcceleration);
@@ -39,14 +41,14 @@ public class SwerveControlCommand extends Command{
     @Override
     public void execute() {
         // Grabs Joystick Inputs as Speed Inputs
-        double xSpeed = gamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort);
-        double ySpeed = gamepad.getRawAxis(JoystickConstants.kleftXJoystickPort);
-        double turningSpeed = gamepad.getRawAxis(JoystickConstants.kRightXJoystickPort);
+        double xSpeed = joystickL.getRawAxis(JoystickConstants.kLeftYJoystickPort);
+        double ySpeed = joystickL.getRawAxis(JoystickConstants.kleftXJoystickPort);
+        double turningSpeed = joystickL.getRawAxis(2);
 
-        if(gamepad.getRawButton(JoystickConstants.kRightBumperPort)) {
-            xSpeed *= 0.5;
-            ySpeed *= 0.5;
-            turningSpeed *= 0.5;
+        if(joystickR.getRawButton(1)) {
+            xSpeed *= 0.25;
+            ySpeed *= 0.25;
+            turningSpeed *= 0.25;
         }
         
         // Apply Deadband to prevent motors accidentally spinning
@@ -55,9 +57,8 @@ public class SwerveControlCommand extends Command{
         turningSpeed = Math.abs(turningSpeed) > JoystickConstants.kDeadzone ? turningSpeed : 0.0;
 
         //Limiting Drive Speeds Acceleration to be linear
-
-        xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kTeleDriveMaxAcceleration;
-        ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kTeleDriveMaxAcceleration;
+        xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kDriveMaxMetersPerSecond;
+        ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kDriveMaxMetersPerSecond;
         turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleRotationMaxAngularAcceleration;
 
         // Creating desired chassis speeds from joystick inputs.

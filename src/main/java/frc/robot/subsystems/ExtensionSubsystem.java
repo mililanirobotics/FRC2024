@@ -20,21 +20,31 @@ public class ExtensionSubsystem extends SubsystemBase {
     public ExtensionSubsystem() {
         //initializing solenoids
         leftExtension = new DoubleSolenoid(
+            1,
             PneumaticsModuleType.REVPH, 
             ExtensionConstants.kLeftExtensionForwardChannel, 
             ExtensionConstants.kLeftExtensionReverseChannel
         );
 
         rightExtension = new DoubleSolenoid(
+            1,
             PneumaticsModuleType.REVPH, 
             ExtensionConstants.kRightExtensionForwardChannel, 
             ExtensionConstants.kRightExtensionReverseChannel
         );
 
         //setting the default state to reverse
-        leftExtension.set(Value.kReverse);
-        rightExtension.set(Value.kReverse);
+        leftExtension.set(Value.kForward);
+        rightExtension.set(Value.kForward);
         isExtended = false;
+    }
+
+    public DoubleSolenoid.Value getLeftState() {
+        return leftExtension.get();
+    }
+
+    public DoubleSolenoid.Value getRightState() {
+        return rightExtension.get();
     }
 
     /**
@@ -62,6 +72,9 @@ public class ExtensionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         //prints the state of the pistons on Smartdashboard
-        SmartDashboard.putBoolean("Is Extended", isExtended);
+        SmartDashboard.putBoolean("is left extended", leftExtension.get() == Value.kForward);
+        SmartDashboard.putBoolean("is right extended", rightExtension.get() == Value.kForward);
+
     }
+    
 }

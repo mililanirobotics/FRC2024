@@ -3,6 +3,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DriverStation;
 //general imports
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 //path planner
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -35,9 +37,32 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     private SwerveDriveOdometry odometry;
     //Field2d 
     private Field2d field;
+    //position translational 
+    private GenericEntry leftFrontTranPosWidget;
+    private GenericEntry leftBackTranPosWidget;
+    private GenericEntry rightFrontTranPosWidget;
+    private GenericEntry rightBackTranPosWidget;
+    //velocity translational
+    private GenericEntry leftFrontTranVelWidget;
+    private GenericEntry leftBackTranVelWidget;
+    private GenericEntry rightFrontTranVelWidget;
+    private GenericEntry rightBackTranVelWidget;
+    //position rotational 
+    private GenericEntry leftFrontRotPosWidget;
+    private GenericEntry leftBackRotPosWidget;
+    private GenericEntry rightFrontRotPosWidget;
+    private GenericEntry rightBackRotPosWidget;
+    //velocity rotational
+    private GenericEntry leftFrontRotVelWidget;
+    private GenericEntry leftBackRotVelWidget;
+    private GenericEntry rightFrontRotVelWidget;
+    private GenericEntry rightBackRotVelWidget;  
+    //gyro data
+    private GenericEntry gyroData;
 
     //constructor
-    public SwerveDriveSubsystem() {
+    public SwerveDriveSubsystem(ShuffleboardTab testTranPos, ShuffleboardTab testTranVel, ShuffleboardTab testRotPos, 
+                                 ShuffleboardTab testRotVel, ShuffleboardTab testPos, ShuffleboardTab testGyroData) {
         //Front Left Module Initializing
         leftFrontModule = new SwerveModule(
             SwerveModuleConstants.kLeftFrontWheelPort, 
@@ -54,7 +79,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             SwerveModuleConstants.kRightFrontWheelPort, 
             SwerveModuleConstants.kRightFrontRotationPort, 
             SwerveModuleConstants.kRightFrontDriveReversed, 
-            SwerveModuleConstants.kRightFrontRotationReversed, 
+            SwerveModuleConstants.kRightFrontRotationReversed,   
             SwerveModuleConstants.kRightFrontCANCoderPort, 
             SwerveModuleConstants.kRightFrontCANCoderOffset, 
             SwerveModuleConstants.kRightFrontCANCoderReversed
@@ -142,7 +167,35 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         }
         );
 
-        SmartDashboard.putData("Field", field);
+        testPos.add("Field", field).withSize(5, 2);
+
+        //adding translational position widgets
+        leftFrontTranPosWidget = testTranPos.add("left_front_tran_pos", 0).withSize(2, 1).getEntry();
+        leftBackTranPosWidget = testTranPos.add("left_back_tran_pos", 0).withSize(2, 1).getEntry();
+        rightFrontTranPosWidget = testTranPos.add("right_front_tran_pos", 0).withSize(2, 1).getEntry();
+        rightBackTranPosWidget = testTranPos.add("right_back_tran_pos", 0).withSize(2, 1).getEntry();
+        //adding translational velocity widgets
+        leftFrontTranVelWidget = testTranVel.add("left_front_tran_vel", 0).withSize(2, 1).getEntry();
+        leftBackTranVelWidget = testTranVel.add("left_back_tran_vel", 0).withSize(2, 1).getEntry();
+        rightFrontTranVelWidget = testTranVel.add("right_front_tran_vel", 0).withSize(2, 1).getEntry();
+        rightBackTranVelWidget = testTranVel.add("right_back_tran_vel", 0).withSize(2, 1).getEntry();
+        //adding rotational position widgets
+        leftFrontRotPosWidget = testRotPos.add("left_front_rot_pos", 0).withSize(2, 1).getEntry();
+        leftBackRotPosWidget = testRotPos.add("left_back_rot_pos", 0).withSize(2, 1).getEntry();
+        rightFrontRotPosWidget = testRotPos.add("right_front_rot_pos", 0).withSize(2, 1).getEntry();
+        rightBackRotPosWidget = testRotPos.add("right_back_rot_pos", 0).withSize(2, 1).getEntry();
+        //adding rotational velocity widgets
+        leftFrontRotVelWidget = testRotVel.add("left_front_rot_vel", 0).withSize(2, 1).getEntry();
+        leftBackRotVelWidget = testRotVel.add("left_back_rot_vel", 0).withSize(2, 1).getEntry();
+        rightFrontRotVelWidget = testRotVel.add("right_front_rot_vel", 0).withSize(2, 1).getEntry();
+        rightBackRotVelWidget = testRotVel.add("right_back_rot_vel", 0).withSize(2, 1).getEntry();
+        //adding gyro widget
+        gyroData = testGyroData.add("gyro_data", getYaw()).withSize(2, 1).getEntry();
+
+        SmartDashboard.putNumber("Right_back_power", rightBackModule.getPower());
+        SmartDashboard.putNumber("Right_front_power", rightFrontModule.getPower());
+        SmartDashboard.putNumber("Left_front_power", leftFrontModule.getPower());
+        SmartDashboard.putNumber("Left_back_power", leftBackModule.getPower());
     }
 
     //=========================================================================== 
@@ -339,11 +392,38 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      * Prints the CANCoder readings to SmartDashboard
      */
     public void getCANCoderReading() {
-        SmartDashboard.putNumber("Left Front: ", leftFrontModule.getCANCoderReading());
-        SmartDashboard.putNumber("Right Front: ", rightFrontModule.getCANCoderReading());
-        SmartDashboard.putNumber("Left Back: ", leftBackModule.getCANCoderReading());
-        SmartDashboard.putNumber("Right Back: ", rightBackModule.getCANCoderReading());
+        SmartDashboard.putNumber("Left Front: ", leftFrontModule.getAbsoluteRotations());
+        SmartDashboard.putNumber("Right Front: ", rightFrontModule.getAbsoluteRotations());
+        SmartDashboard.putNumber("Left Back: ", leftBackModule.getAbsoluteRotations());
+        SmartDashboard.putNumber("Right Back: ", rightBackModule.getAbsoluteRotations());
         SmartDashboard.updateValues();
+    }
+
+    public void printTestingData() {
+        //translational position
+        leftFrontTranPosWidget.setDouble(leftFrontModule.getDrivePosition());
+        leftBackTranPosWidget.setDouble(leftBackModule.getDrivePosition());
+        rightFrontTranPosWidget.setDouble(rightFrontModule.getDrivePosition());
+        rightBackTranPosWidget.setDouble(rightBackModule.getDrivePosition());
+        //translational velocity
+        leftFrontTranVelWidget.setDouble(leftFrontModule.getDriveVelocity());
+        leftBackTranVelWidget.setDouble(leftBackModule.getDriveVelocity());
+        rightFrontTranVelWidget.setDouble(rightFrontModule.getDriveVelocity());
+        rightBackTranVelWidget.setDouble(rightBackModule.getDriveVelocity());
+        //rotational position
+        leftFrontRotPosWidget.setDouble(leftFrontModule.getRotationPosition());
+        leftBackRotPosWidget.setDouble(leftBackModule.getRotationPosition());
+        rightFrontRotPosWidget.setDouble(rightFrontModule.getRotationPosition());
+        rightBackRotPosWidget.setDouble(rightBackModule.getRotationPosition());
+        //rotational velocity
+        leftFrontRotVelWidget.setDouble(leftFrontModule.getRotationVelocity());
+        leftBackRotVelWidget.setDouble(leftBackModule.getRotationVelocity());
+        rightFrontRotVelWidget.setDouble(rightFrontModule.getRotationVelocity());
+        rightBackRotVelWidget.setDouble(rightBackModule.getRotationVelocity());
+        //odometry 
+        // odometryPos.setValue(odometry.getPoseMeters());
+        //gyro
+        gyroData.setValue(getYaw());
     }
 
     @Override
@@ -354,15 +434,14 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             getModulePosition()
         );
 
+        //updates the robot's pose on the Field2d widget
         field.setRobotPose(odometry.getPoseMeters());
 
-        //puts info on SmartDashboard
-        SmartDashboard.putNumber("Robot Heading", getDegrees());
-        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
-        SmartDashboard.putNumber("Translational Velocity", leftFrontModule.getDriveVelocity());
+        //prints the CANcoder readings on all 4 modules 
+        printTestingData();
+        getCANCoderReading();
 
         //path planner
-
         PathPlannerLogging.setLogCurrentPoseCallback(
             (pose) -> {
                 field.setRobotPose(pose);

@@ -53,6 +53,11 @@ public class AprilTagsSubsystem extends SubsystemBase{
         return verticalOffset;  
     }
 
+
+    public boolean isAmpAligned() {
+        return getHorizontalOffset() < 100 && getVerticalOffset() < 100;
+    }
+
     /**
      * Sets the current pipeline on the limelight to the desired one
      * @param pipeline sets the limelight's current pipeline

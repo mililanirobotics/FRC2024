@@ -15,7 +15,7 @@ public class ScoringSubsystem extends SubsystemBase {
   private CANSparkMax topLaunchRoller;
   private CANSparkMax bottomLaunchRoller;
   //IR sensor
-  // private DigitalInput stopScoringSensor;
+  private DigitalInput stopScoringSensor;
 
   //constructor
   public ScoringSubsystem() {
@@ -26,7 +26,7 @@ public class ScoringSubsystem extends SubsystemBase {
     topLaunchRoller.setInverted(ScoringConstants.kUpperFlywheelReverse);
     bottomLaunchRoller.setInverted(ScoringConstants.kLowerFlywheelReverse);
     //IR sensors
-    // stopScoringSensor = new DigitalInput(ScoringConstants.kScoringSensorPort);
+    stopScoringSensor = new DigitalInput(ScoringConstants.kScoringSensorPort);
   }
 
   /**
@@ -39,13 +39,13 @@ public class ScoringSubsystem extends SubsystemBase {
     bottomLaunchRoller.set(botPower);
   }
 
-  // /**
-  //  * Returns whether or not the IR sensor beam at the end of the scoring payload has been broken by the note
-  //  * @return The state of the IR sensor
-  //  */
-  // public boolean getStopSensorReading() {
-  //   return stopScoringSensor.get();
-  // }
+  /**
+   * Returns whether or not the IR sensor beam at the end of the scoring payload has been broken by the note
+   * @return The state of the IR sensor
+   */
+  public boolean getStopSensorReading() {
+    return stopScoringSensor.get();
+  }
 
   /**
    * Sets the power of the conveyor motors to 0
@@ -58,6 +58,6 @@ public class ScoringSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     //prints the state of the IR sensor on Smartdashboard
-    // SmartDashboard.putBoolean("Scoring Sensor Triggered", getStopSensorReading());
+    SmartDashboard.putBoolean("Scoring Sensor Triggered", getStopSensorReading());
   }
 }

@@ -23,7 +23,7 @@ public class ManualIntakeConveyorCommand extends Command {
     @Override
     public void execute() { 
         //sets the conveyor speed based on the secondary gamepad's left joystick value
-        double speed = joystick.getRawAxis(JoystickConstants.kLeftYJoystickPort);
+        double speed = -joystick.getRawAxis(JoystickConstants.kLeftYJoystickPort);
 
         //setting speeds
         m_intakeConveyorSubsystem.setSpeeds(speed);

@@ -14,10 +14,11 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
   private CANSparkMax leftConveyorTopRoller;
   private CANSparkMax rightConveyorBottomRoller;
   //IR sensors
-  // private DigitalInput startIntakeConveyorSensor;
-  // private DigitalInput stopIntakeConveyorSensor;
+  private DigitalInput startIntakeConveyorSensor;
+  private DigitalInput stopIntakeConveyorSensor;
   
   private boolean inScorer;
+  private boolean inRobot;
 
   //constructor
   public IntakeConveyorSubsystem() {
@@ -28,42 +29,29 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
     leftConveyorTopRoller.setInverted(IntakeConveyorConstants.kLeftConveyorTopRollerReverse);
     rightConveyorBottomRoller.setInverted(IntakeConveyorConstants.kRightConveyorBottomRollerReverse);
     //IR sensors
-    // startIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStartIntakeConveyorSensorPort);
-    // stopIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStopIntakeConveyorSensorPort);
-    
-    inScorer = false;
-  }
-
-  // /**
-  //  * Returns whether or not the IR sensor beam on the bottom of the robot has been broken by the note
-  //  * @return The state of the IR sensor
-  //  */
-  // public boolean getStartSensorReading() {
-  //   return startIntakeConveyorSensor.get();
-  // }
-
-  // /**
-  //  * Returns whether or not the IR sensor beam at the top of the conveyor has been broken by the note
-  //  * @return The state of the IR sensor
-  //  */
-  // public boolean getStopSensorReading() {
-  //   return stopIntakeConveyorSensor.get();
-  // }
-
-  /**
-   * Returns whether the note has transitioned into the scorer
-   * @return If the note is in the scorer or not
-   */
-  public boolean isInScorer() {
-    return inScorer;
+    startIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStartIntakeConveyorSensorPort);
+    stopIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStopIntakeConveyorSensorPort);
+  
   }
 
   /**
-   * Updates the value of the boolean inScorer based on the input
-   * @param inScorer Whether the note is in the scorer
+   * Returns whether or not the IR sensor beam on the bottom of the robot has been broken by the note
+   * @return The state of the IR sensor
    */
-  public void setInScorer(boolean inScorer) {
-    this.inScorer = inScorer;
+  public boolean getStartSensorReading() {
+    return startIntakeConveyorSensor.get();
+  }
+
+  public boolean getStartSensorReadingReverse() {
+    return !startIntakeConveyorSensor.get();
+  }
+
+  /**
+   * Returns whether or not the IR sensor beam at the top of the conveyor has been broken by the note
+   * @return The state of the IR sensor
+   */
+  public boolean getStopSensorReading() {
+    return stopIntakeConveyorSensor.get();
   }
 
   /**
@@ -86,7 +74,10 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     //prints the state of the IR sensors on Smartdashboard
-    // SmartDashboard.putBoolean("Start Sensor Triggered", getStartSensorReading());
-    // SmartDashboard.putBoolean("Stop Sensor Triggered", getStopSensorReading());
+    SmartDashboard.putBoolean("Start Sensor Triggered", getStartSensorReading());
+    SmartDashboard.putBoolean("Stop Sensor Triggered", getStopSensorReading());
+
+    //yo mama
+  
   }
 }

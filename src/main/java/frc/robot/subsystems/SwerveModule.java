@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkRelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
@@ -60,6 +61,14 @@ public class SwerveModule {
         driveMotor.setInverted(driveReversed);
         rotationMotor.setInverted(rotationReversed);
 
+        //reseting faults 
+        driveMotor.clearFaults();
+        // driveMotor.setSmartCurrentLimit(currentLimit);
+        rotationMotor.clearFaults();
+        rotationMotor.setSmartCurrentLimit(SwerveModuleConstants.kRotationCurrentLimit);
+        driveMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
+        rotationMotor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+
         //initializing encoders
         driveEncoder = driveMotor.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);
         rotationEncoder = rotationMotor.getEncoder(SparkRelativeEncoder.Type.kHallSensor, 42);   
@@ -110,6 +119,10 @@ public class SwerveModule {
         return driveEncoder.getVelocity();
     }
 
+    public double getPower() {
+        return driveMotor.getAppliedOutput();
+    }
+
     /**
      * Returns the current velocity of the swerve module's rotation motor
      * @return The current velocity of the rotation motor in radians per second
@@ -126,6 +139,10 @@ public class SwerveModule {
     public double getCANCoderReading() {
         double angle = (angleCANCoder.getAbsolutePosition().getValueAsDouble());
         return (angle * 2.0 * Math.PI) * (CANCoderReversed ? -1 : 1);   
+    }
+
+    public double getAbsoluteRotations() {
+        return angleCANCoder.getAbsolutePosition().getValueAsDouble();
     }
 
     /**
@@ -159,8 +176,16 @@ public class SwerveModule {
         }
 
         currentState = SwerveModuleState.optimize(currentState, getModuleState().angle);
-        driveMotor.set(currentState.speedMetersPerSecond / DriveConstants.kDriveMaxMetersPerSecond);
-        rotationMotor.set(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()));
+        double currentSpeed = currentState.speedMetersPerSecond;
+        double limit = DriveConstants.kDriveMetersPerSecondLimit;
+        double maximumSpeed = DriveConstants.kDriveMaxMetersPerSecond;
+
+        driveMotor.set(Math.abs(currentSpeed) > limit
+            ? Math.copySign(limit, currentSpeed) / maximumSpeed
+            : currentSpeed / maximumSpeed);
+
+        // driveMotor.set(1);
+        // rotationMotor.set(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()));
     }
 }
 

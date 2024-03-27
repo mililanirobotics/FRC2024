@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import frc.robot.subsystems.ExtensionSubsystem;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class LowerExtensionCommand extends Command {
@@ -15,13 +16,18 @@ public class LowerExtensionCommand extends Command {
     
     @Override
     public void initialize() {
-        System.out.println("Manual extension command started");
+        System.out.println("Lower extension command started");
         m_extensionSubsystem.retract();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        System.out.println("Lower extension command finished");
     }
 
     //in progress
     @Override
     public boolean isFinished() {
-        return !m_extensionSubsystem.isExtended();
+        return m_extensionSubsystem.getLeftState() == Value.kReverse && m_extensionSubsystem.getRightState() == Value.kReverse;
     }
 }

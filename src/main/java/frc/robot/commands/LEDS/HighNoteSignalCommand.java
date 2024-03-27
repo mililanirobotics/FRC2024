@@ -5,10 +5,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.animations;
 
-public class Signal2Command extends Command {
+public class HighNoteSignalCommand extends Command {
     private final LEDSubsystem m_LedSubsystem;
 
-    public Signal2Command(LEDSubsystem m_LedSubsystem) {
+    public HighNoteSignalCommand(LEDSubsystem m_LedSubsystem) {
         this.m_LedSubsystem = m_LedSubsystem;
         addRequirements(m_LedSubsystem);
     }
@@ -18,9 +18,8 @@ public class Signal2Command extends Command {
     public void initialize() {
         m_LedSubsystem.clear();
         m_LedSubsystem
-            .setOffset(8)
-            .setColor(new Color(160, 32, 240))
-            .setAnimation(animations.FIRE_ANIM);
+            .setColor(new Color(255, 100, 0))
+            .setAnimation(animations.SET_ALL);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
