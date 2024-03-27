@@ -11,23 +11,20 @@ import frc.robot.Constants.IntakeConveyorConstants;
 
 public class IntakeConveyorSubsystem extends SubsystemBase {
   //motor controllers
-  private CANSparkMax leftConveyorTopRoller;
-  private CANSparkMax rightConveyorBottomRoller;
+  private CANSparkMax greenRollerConveyor;
+  private CANSparkMax blueRollerConveyor;
   //IR sensors
   private DigitalInput startIntakeConveyorSensor;
   private DigitalInput stopIntakeConveyorSensor;
-  
-  private boolean inScorer;
-  private boolean inRobot;
 
   //constructor
   public IntakeConveyorSubsystem() {
     //initializing motor controllers
-    leftConveyorTopRoller = new CANSparkMax(IntakeConveyorConstants.kLeftConveyorTopRollerPort, MotorType.kBrushless);
-    rightConveyorBottomRoller = new CANSparkMax(IntakeConveyorConstants.kRightConveyorBottomRollerPort, MotorType.kBrushless);
+    greenRollerConveyor = new CANSparkMax(IntakeConveyorConstants.kGreenRollerConveyorPort, MotorType.kBrushless);
+    blueRollerConveyor = new CANSparkMax(IntakeConveyorConstants.kBlueRollerConveyorPort, MotorType.kBrushless);
     //setting directionality 
-    leftConveyorTopRoller.setInverted(IntakeConveyorConstants.kLeftConveyorTopRollerReverse);
-    rightConveyorBottomRoller.setInverted(IntakeConveyorConstants.kRightConveyorBottomRollerReverse);
+    greenRollerConveyor.setInverted(IntakeConveyorConstants.kGreenRollerConveyorReverse);
+    blueRollerConveyor.setInverted(IntakeConveyorConstants.kBlueRollerConveyorReverse);
     //IR sensors
     startIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStartIntakeConveyorSensorPort);
     stopIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStopIntakeConveyorSensorPort);
@@ -59,16 +56,16 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
    * @param percentPower The requested speed of the motors
    */
   public void setSpeeds(double percentPower) {
-    leftConveyorTopRoller.set(percentPower);
-    rightConveyorBottomRoller.set(percentPower);
+    greenRollerConveyor.set(percentPower);
+    blueRollerConveyor.set(percentPower);
   }
 
   /**
    * Sets the power of the conveyor motors to 0
    */
   public void shutdown() {
-      leftConveyorTopRoller.set(0);
-      rightConveyorBottomRoller.set(0);
+      greenRollerConveyor.set(0);
+      blueRollerConveyor.set(0);
   }
 
   @Override
@@ -76,8 +73,5 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
     //prints the state of the IR sensors on Smartdashboard
     SmartDashboard.putBoolean("Start Sensor Triggered", getStartSensorReading());
     SmartDashboard.putBoolean("Stop Sensor Triggered", getStopSensorReading());
-
-    //yo mama
-  
   }
 }
