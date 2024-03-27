@@ -14,18 +14,24 @@ import frc.robot.subsystems.SwerveDriveSubsystem;
 import frc.robot.commands.LEDS.AlignedSignalCommand;
 import frc.robot.commands.LowerExtensionCommand;
 import frc.robot.commands.RaiseExtensionCommand;
+<<<<<<< HEAD
 import frc.robot.commands.AutomationCommands.AutoIntakeConveyorCommand;
 import frc.robot.commands.LEDS.ExtendedSignalCommand;
 import frc.robot.commands.LEDS.HighNoteSignalCommand;
 import frc.robot.commands.LEDS.LowNoteSignalCommand;
 import frc.robot.commands.LEDS.MidNoteSignalCommand;
 import frc.robot.commands.AutomationCommands.AutoScoringCommand;
+=======
+// import frc.robot.commands.AutomationCommands.AutoIntakeConveyorCommand;
+// import frc.robot.commands.AutomationCommands.AutoScoringCommand;
+>>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
 import frc.robot.commands.ManualControls.ManualIntakeConveyorCommand;
 import frc.robot.commands.ManualControls.ManualScoringCommand;
 import frc.robot.commands.ManualControls.ManualScoringReverseCommand;
 import frc.robot.commands.ManualControls.SwerveControlCommand;
 import frc.robot.commands.TestCommands.TestManualIntakeConveyorCommand;
 import frc.robot.commands.TestCommands.TestManualScoringCommand;
+import frc.robot.commands.VisionCommands.AlignmentTurningCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -57,10 +63,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+<<<<<<< HEAD
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+=======
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+>>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
 //constants
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.JoystickConstants;
@@ -98,9 +108,14 @@ public class RobotContainer {
   private final LEDSubsystem ledSubsystem = new LEDSubsystem();
 
   //initailizing gamepads
+<<<<<<< HEAD
   private final GenericHID priamryJoystickL = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
   private final GenericHID priamryJoystickR = new GenericHID(JoystickConstants.kSecondaryGamepadPort);
   private final GenericHID secondaryJoystick = new GenericHID(2);
+=======
+  private final GenericHID primaryJoystick = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
+  private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kSecondaryGamepadPort);
+>>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
 
   //initializing sendable chooser for auto
   private SendableChooser<Command> autoCommand;
@@ -125,8 +140,12 @@ public class RobotContainer {
     //setting the default command for the swerve drive
     swerveDriveSubsystem.setDefaultCommand(new SwerveControlCommand(
         swerveDriveSubsystem, 
+<<<<<<< HEAD
         priamryJoystickL,
         priamryJoystickR
+=======
+        primaryJoystick
+>>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
       )
     );
 
@@ -210,6 +229,12 @@ public class RobotContainer {
       new ManualIntakeConveyorCommand(secondaryJoystick, intakeConveyorSubsystem)
     );
     
+    new Trigger(
+      () -> primaryJoystick.getRawButton(JoystickConstants.kLeftBumperPort)
+    ).onTrue(
+      new AlignmentTurningCommand(swerveDriveSubsystem, aprilTagsSubsystem)
+    );
+
     //manually controls the extensions with the left bumper and trigger
     new Trigger(
       () -> secondaryJoystick.getRawAxis(JoystickConstants.kRightTriggerPort) >= 0.5
