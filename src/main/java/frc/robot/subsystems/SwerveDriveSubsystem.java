@@ -127,21 +127,21 @@ public class SwerveDriveSubsystem extends SubsystemBase {
 
         //initializing AutoBuilder to create path planner autopaths
         //flips the created autopath if on the Red Alliance
-        AutoBuilder.configureHolonomic(
-            this::getPose, 
-            this::resetOdometry, 
-            this::getSpeeds, 
-            this::driveRobotRelative, 
-            AutoConstants.pathFollowingConfig, 
-            () -> {
-                var alliance = DriverStation.getAlliance();
-                if(alliance.isPresent()) { 
-                    return alliance.get() == DriverStation.Alliance.Red;
-                }
-                return false;
-            },
-            this
-        );
+        // AutoBuilder.configureHolonomic(
+        //     this::getPose, 
+        //     this::resetOdometry, 
+        //     this::getSpeeds, 
+        //     this::driveRobotRelative, 
+        //     AutoConstants.pathFollowingConfig, 
+        //     () -> {
+        //         var alliance = DriverStation.getAlliance();
+        //         if(alliance.isPresent()) { 
+        //             return alliance.get() == DriverStation.Alliance.Red;
+        //         }
+        //         return false;
+        //     },
+        //     this
+        // );
 
         //Path Planner logging
         field = new Field2d();
@@ -192,10 +192,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         //adding gyro widget
         gyroData = testGyroData.add("gyro_data", getYaw()).withSize(2, 1).getEntry();
 
-        SmartDashboard.putNumber("Right_back_power", rightBackModule.getPower());
-        SmartDashboard.putNumber("Right_front_power", rightFrontModule.getPower());
-        SmartDashboard.putNumber("Left_front_power", leftFrontModule.getPower());
-        SmartDashboard.putNumber("Left_back_power", leftBackModule.getPower());
+        SmartDashboard.putNumber("Right_back_power", rightBackModule.getCurrentDrive());
+        SmartDashboard.putNumber("Right_front_power", rightFrontModule.getCurrentDrive());
+        SmartDashboard.putNumber("Left_front_power", leftFrontModule.getCurrentDrive());
+        SmartDashboard.putNumber("Left_back_power", leftBackModule.getCurrentDrive());
     }
 
     //=========================================================================== 

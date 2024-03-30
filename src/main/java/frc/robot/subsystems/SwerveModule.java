@@ -37,11 +37,7 @@ public class SwerveModule {
         //initializing absolute encoder parameters 
         this.CANCoderReversed = CANCoderReversed;
         angleCANCoder = new CANcoder(CANCoderPort);
-        //angleCANCoder.setPosition(angleCANCoder.getAbsolutePosition().getValueAsDouble());
-        // angleCANCoder.setPositionToAbsolute();
-        // angleCANCoder.configAbsoluteSensorRange(AbsoluteSensorRangeValue.Unsigned_0_to_360);
-        // angleCANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-        // angleCANCoder.setControl()
+      
         // Configure the CANcoder for basic use
         CANcoderConfiguration configs = new CANcoderConfiguration();
         
@@ -119,8 +115,20 @@ public class SwerveModule {
         return driveEncoder.getVelocity();
     }
 
-    public double getPower() {
+    /**
+     * Returns the current going into the drive motors
+     * @return The current going into the drive motors in amps
+     */
+    public double getCurrentDrive() {
         return driveMotor.getAppliedOutput();
+    }
+
+    /**
+     * Returns the current going into the rotation motors
+     * @return The current going into the rotation motor in amps
+     */
+    public double getCurrentRotation() {
+        return rotationMotor.getAppliedOutput();
     }
 
     /**
@@ -185,7 +193,7 @@ public class SwerveModule {
             : currentSpeed / maximumSpeed);
 
         // driveMotor.set(1);
-        // rotationMotor.set(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()));
+        rotationMotor.set(rotationPID.calculate(getRotationPosition(), currentState.angle.getRadians()));
     }
 }
 

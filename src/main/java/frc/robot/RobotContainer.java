@@ -11,30 +11,33 @@ import frc.robot.subsystems.IntakeConveyorSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
+import frc.robot.subsystems.SwivelSubsystem;
 import frc.robot.commands.LEDS.AlignedSignalCommand;
 import frc.robot.commands.LowerExtensionCommand;
 import frc.robot.commands.RaiseExtensionCommand;
-<<<<<<< HEAD
 import frc.robot.commands.AutomationCommands.AutoIntakeConveyorCommand;
 import frc.robot.commands.LEDS.ExtendedSignalCommand;
 import frc.robot.commands.LEDS.HighNoteSignalCommand;
 import frc.robot.commands.LEDS.LowNoteSignalCommand;
-import frc.robot.commands.LEDS.MidNoteSignalCommand;
 import frc.robot.commands.AutomationCommands.AutoScoringCommand;
-=======
-// import frc.robot.commands.AutomationCommands.AutoIntakeConveyorCommand;
-// import frc.robot.commands.AutomationCommands.AutoScoringCommand;
->>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
+import frc.robot.commands.AutomationCommands.NoteToScorerCommand;
 import frc.robot.commands.ManualControls.ManualIntakeConveyorCommand;
 import frc.robot.commands.ManualControls.ManualScoringCommand;
 import frc.robot.commands.ManualControls.ManualScoringReverseCommand;
-import frc.robot.commands.ManualControls.SwerveControlCommand;
+import frc.robot.commands.ManualControls.ManualSwivelCommand;
+import frc.robot.commands.ManualControls.SetSwivelToAmpCommand;
+import frc.robot.commands.ManualControls.SetSwivelToDriverViewCommand;
+import frc.robot.commands.ManualControls.SetSwivelToMiddleCommand;
+import frc.robot.commands.ManualControls.SwerveControlGamepadCommand;
+import frc.robot.commands.ManualControls.SwerveControlJoystickCommand;
 import frc.robot.commands.TestCommands.TestManualIntakeConveyorCommand;
 import frc.robot.commands.TestCommands.TestManualScoringCommand;
+import frc.robot.commands.VisionCommands.AlignmentTranslationalCommand;
 import frc.robot.commands.VisionCommands.AlignmentTurningCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 //path planner
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -50,11 +53,18 @@ import java.util.function.BooleanSupplier;
 
 import org.opencv.photo.AlignExposures;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -63,18 +73,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-<<<<<<< HEAD
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-=======
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
->>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
+import frc.robot.Constants.AprilTagConstants;
 //constants
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.JoystickConstants;
 import frc.robot.Constants.ScoringConstants;
+import frc.robot.Constants.SwerveModuleConstants;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -106,20 +115,20 @@ public class RobotContainer {
 
   private final ExtensionSubsystem extensionSubsystem = new ExtensionSubsystem();
   private final LEDSubsystem ledSubsystem = new LEDSubsystem();
-
-  //initailizing gamepads
-<<<<<<< HEAD
-  private final GenericHID priamryJoystickL = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
-  private final GenericHID priamryJoystickR = new GenericHID(JoystickConstants.kSecondaryGamepadPort);
-  private final GenericHID secondaryJoystick = new GenericHID(2);
-=======
-  private final GenericHID primaryJoystick = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
-  private final GenericHID secondaryJoystick = new GenericHID(JoystickConstants.kSecondaryGamepadPort);
->>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
+  private final SwivelSubsystem swivelSubsystem = new SwivelSubsystem();
 
   //initializing sendable chooser for auto
   private SendableChooser<Command> autoCommand;
   private boolean isTesting = false; //purely for testing purposes
+
+  //initailizing gamepads
+  private final GenericHID primaryGamepad = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
+  private final GenericHID secondaryGamepad = new GenericHID(JoystickConstants.kSecondaryGamepadPort);
+  private final GenericHID test = new GenericHID(2);
+
+  // private final GenericHID priamryJoystickL = new GenericHID(JoystickConstants.kPrimaryGamepadPort);
+  // private final GenericHID priamryJoystickR = new GenericHID(JoystickConstants.kSecondaryGamepadPort);
+  // private final GenericHID secondaryGamepad = new GenericHID(2);
 
   private final Field2d field = new Field2d();
 
@@ -133,19 +142,21 @@ public class RobotContainer {
 
     if(isTesting) {
       //setting default commands for testing
-      // intakeConveyorSubsystem.setDefaultCommand(new TestManualIntakeConveyorCommand(secondaryJoystick, intakeConveyorSubsystem));
-      scoringSubsytem.setDefaultCommand(new TestManualScoringCommand(secondaryJoystick, scoringSubsytem));
+      // intakeConveyorSubsystem.setDefaultCommand(new TestManualIntakeConveyorCommand(secondaryGamepad, intakeConveyorSubsystem));
+      scoringSubsytem.setDefaultCommand(new TestManualScoringCommand(secondaryGamepad, scoringSubsytem));
     }
 
     //setting the default command for the swerve drive
-    swerveDriveSubsystem.setDefaultCommand(new SwerveControlCommand(
+    // swerveDriveSubsystem.setDefaultCommand(new SwerveControlJoystickCommand(
+    //     swerveDriveSubsystem, 
+    //     priamryJoystickL,
+    //     priamryJoystickR
+    //   )
+    // );
+
+    swerveDriveSubsystem.setDefaultCommand(new SwerveControlGamepadCommand(
         swerveDriveSubsystem, 
-<<<<<<< HEAD
-        priamryJoystickL,
-        priamryJoystickR
-=======
-        primaryJoystick
->>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
+        primaryGamepad
       )
     );
 
@@ -193,22 +204,93 @@ public class RobotContainer {
     // autoCommand.addOption("Ur Mom", new PathPlannerAuto("Ur Mom"));
     // autoCommand.addOption("Ur Mom X2", onTheFlyCommand(new Pose2d(0, 0, new Rotation2d()), new Pose2d(0, 0, Rotation2d.fromDegrees(90))));
 
+    //=========================================================================== 
+    // primary controls
+    //===========================================================================
+    new JoystickButton(primaryGamepad, JoystickConstants.kRightBumperPort).onTrue(
+      new InstantCommand(() -> intakeConveyorSubsystem.setNoteIn(false), intakeConveyorSubsystem)
+    );
+
+    //=========================================================================== 
+    // secondary controls
+    //===========================================================================
+
     //starts the auto-scoring command if the A button is pressed; stops if one of the conditions is met
-    new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort).onTrue(
-      new AutoScoringCommand(scoringSubsytem).until(
-        () -> secondaryJoystick.getRawButton(JoystickConstants.kRightBumperPort)
-                || secondaryJoystick.getRawButton(JoystickConstants.kXButtonPort)
-                || secondaryJoystick.getRawButton(JoystickConstants.kBButtonPort)
+    new JoystickButton(secondaryGamepad, JoystickConstants.kAButtonPort).onTrue(
+      new RaiseExtensionCommand(extensionSubsystem).andThen(
+        new WaitCommand(0.5)
+      ).andThen(
+        new AutoScoringCommand(intakeConveyorSubsystem, scoringSubsytem).onlyIf(
+          extensionSubsystem::isExtended
+        )
+      )/*.onlyIf(
+        aprilTagsSubsystem::isAmpAligned
+      )*/.until(
+        () -> secondaryGamepad.getRawButtonPressed(JoystickConstants.kRightBumperPort)
+                || secondaryGamepad.getRawButtonPressed(JoystickConstants.kXButtonPort)
+                || secondaryGamepad.getRawButtonPressed(JoystickConstants.kBButtonPort)
+      ).andThen(
+        new LowerExtensionCommand(extensionSubsystem)
       )
     );
 
+    new JoystickButton(primaryGamepad, JoystickConstants.kLeftBumperPort).onTrue(
+      new AlignmentTurningCommand(swerveDriveSubsystem, aprilTagsSubsystem)
+    );
+
+    new Trigger(
+      () -> primaryGamepad.getRawAxis(JoystickConstants.kLeftTriggerPort) >= 0.5
+    ).onTrue(
+      new AlignmentTranslationalCommand(swerveDriveSubsystem, aprilTagsSubsystem)
+    );
+
     //manually controls the scoring payload with the A and B button (A normal, B reverse)
-    new JoystickButton(secondaryJoystick, JoystickConstants.kBButtonPort).onTrue(
-      new ManualScoringCommand(secondaryJoystick, scoringSubsytem)
+    new JoystickButton(secondaryGamepad, JoystickConstants.kBButtonPort).onTrue(
+      new ManualScoringCommand(secondaryGamepad, scoringSubsytem)
+    ); 
+
+    //manually controls the intake and conveyor with the left Y-joystick
+    new Trigger(
+      () -> Math.abs(secondaryGamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort)) >= JoystickConstants.kDeadzone
+    ).onTrue(
+      new ManualIntakeConveyorCommand(secondaryGamepad, intakeConveyorSubsystem)
     );
-    new JoystickButton(secondaryJoystick, JoystickConstants.kXButtonPort).onTrue(
-      new ManualScoringReverseCommand(secondaryJoystick, scoringSubsytem)
+
+    //manually controls the extensions with the left bumper and trigger
+    new Trigger(
+      () -> secondaryGamepad.getRawAxis(JoystickConstants.kRightTriggerPort) >= 0.5
+    ).onTrue(
+      new RaiseExtensionCommand(extensionSubsystem)
     );
+    new Trigger(
+      () -> secondaryGamepad.getRawAxis(JoystickConstants.kLeftTriggerPort) >= 0.5
+    ).onTrue(
+      new LowerExtensionCommand(extensionSubsystem)
+    );
+
+    //sets the servo to the driver and amp view
+    new Trigger(
+      () -> secondaryGamepad.getRawAxis(JoystickConstants.kRightYJoystickPort) <= -0.5
+    ).onTrue(
+      new SetSwivelToAmpCommand(swivelSubsystem).alongWith(
+        new InstantCommand(() -> aprilTagsSubsystem.setPipeline(AprilTagConstants.kAmpPipeline), aprilTagsSubsystem)
+      )
+    );
+
+    new Trigger(
+      () -> secondaryGamepad.getRawAxis(JoystickConstants.kRightYJoystickPort) >= 0.5
+    ).onTrue(
+      new SetSwivelToDriverViewCommand(swivelSubsystem).alongWith(
+        new InstantCommand(() -> aprilTagsSubsystem.setPipeline(AprilTagConstants.kDriverPipeline), aprilTagsSubsystem)
+      )
+    );
+
+    new JoystickButton(secondaryGamepad, JoystickConstants.kLeftBumperPort).onTrue(
+      new SetSwivelToMiddleCommand(swivelSubsystem).alongWith(
+        new InstantCommand(() -> aprilTagsSubsystem.setPipeline(AprilTagConstants.kDriverPipeline), aprilTagsSubsystem)
+      )
+    );
+
     // new JoystickButton(secondaryJoystick, JoystickConstants.kAButtonPort).whileTrue(
     //   new HighNoteSignalCommand(ledSubsystem)
     // );
@@ -221,31 +303,13 @@ public class RobotContainer {
     // new JoystickButton(secondaryJoystick, JoystickConstants.kBButtonPort).whileTrue(
     //   new MidNoteSignalCommand(ledSubsystem)
     // );
-    
-    //manually controls the intake and conveyor with the left Y-joystick
-    new Trigger(
-      () -> Math.abs(secondaryJoystick.getRawAxis(JoystickConstants.kLeftYJoystickPort)) >= JoystickConstants.kDeadzone
-    ).onTrue(
-      new ManualIntakeConveyorCommand(secondaryJoystick, intakeConveyorSubsystem)
-    );
-    
-    new Trigger(
-      () -> primaryJoystick.getRawButton(JoystickConstants.kLeftBumperPort)
-    ).onTrue(
-      new AlignmentTurningCommand(swerveDriveSubsystem, aprilTagsSubsystem)
-    );
 
-    //manually controls the extensions with the left bumper and trigger
-    new Trigger(
-      () -> secondaryJoystick.getRawAxis(JoystickConstants.kRightTriggerPort) >= 0.5
-    ).onTrue(
-      new RaiseExtensionCommand(extensionSubsystem)
-    );
-    new Trigger(
-      () -> secondaryJoystick.getRawAxis(JoystickConstants.kLeftTriggerPort) >= 0.5
-    ).onTrue(
-      new LowerExtensionCommand(extensionSubsystem)
-    );
+    //=========================================================================== 
+    // sensor triggers
+    //===========================================================================
+
+    
+  
 
     //trigger that schedules the AutoIntakeCommand once the bottom IR sensor is triggered
     // new Trigger(
@@ -261,20 +325,28 @@ public class RobotContainer {
     //   )
     // );
 
-    //maybe works???
+    //maybe works??
     new Trigger(
       intakeConveyorSubsystem::getStartSensorReadingReverse
     ).onTrue(
-        new AutoIntakeConveyorCommand(intakeConveyorSubsystem, scoringSubsytem)
-      );
+      new AutoIntakeConveyorCommand(intakeConveyorSubsystem)
+      .alongWith(
+        new NoteToScorerCommand(scoringSubsytem)
+      )
+      .unless(
+        intakeConveyorSubsystem::isNoteIn
+      )
+      .until(
+        () -> secondaryGamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort) >= JoystickConstants.kDeadzone
+                || secondaryGamepad.getRawButton(JoystickConstants.kRightBumperPort)
+      )
+    );
 
+    // //maybe works???
     // new Trigger(
     //   intakeConveyorSubsystem::getStartSensorReadingReverse
     // ).onTrue(
-    //     new AutoIntakeConveyorCommand(intakeConveyorSubsystem).until(
-    //     () -> secondaryJoystick.getRawAxis(JoystickConstants.kLeftYJoystickPort) >= JoystickConstants.kDeadzone
-    //             || secondaryJoystick.getRawButton(JoystickConstants.kRightBumperPort)
-    //     )
+    //   new AutoIntakeConveyorCommand(intakeConveyorSubsystem, scoringSubsytem).unless(intakeConveyorSubsystem::isNoteIn)
     // );
   }
 
@@ -327,6 +399,71 @@ public class RobotContainer {
     return autoCommand.getSelected();
   }
 
+  //WPLIB test
+  public Command swerveCommand() {
+    //creating the trajectory config
+    TrajectoryConfig trajectoryConfig = new TrajectoryConfig( 
+      AutoConstants.kAutoDriveMaxMetersPerSecond,
+      AutoConstants.kAutoDriveMaxAcceleration
+    )
+    .setKinematics(SwerveModuleConstants.kinematics);
+
+    //generating trajectory
+    Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
+      new Pose2d(0, 0, new Rotation2d(0)), 
+      List.of(
+        new Translation2d(1, 0),
+        new Translation2d(1, -1)
+      ),
+      new Pose2d(2, -1, Rotation2d.fromDegrees(180)),
+      trajectoryConfig
+    );
+
+    //creating PID controllers
+    PIDController XController = new PIDController(
+      AutoConstants.kPXController, 
+      AutoConstants.kIXController, 
+      AutoConstants.kDXController
+    );
+
+    PIDController yController = new PIDController(
+      AutoConstants.kPYController, 
+      AutoConstants.kIYController, 
+      AutoConstants.kDYController
+    );
+
+    ProfiledPIDController thetaController = new ProfiledPIDController(
+      AutoConstants.kPThetaController, 
+      AutoConstants.kIThetaController, 
+      AutoConstants.kDThetaController, 
+      new TrapezoidProfile.Constraints(
+        AutoConstants.kAutoDriveMaxRadiansPerSecond, 
+        AutoConstants.kAutoDriveMaxAngularAcceleration
+      )
+    );
+
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    //constructing command
+    SwerveControllerCommand swerveCommand = new SwerveControllerCommand(
+      trajectory, 
+      swerveDriveSubsystem::getPose,
+      SwerveModuleConstants.kinematics,
+      XController,
+      yController,
+      thetaController,
+      swerveDriveSubsystem::setModuleStates,
+      swerveDriveSubsystem
+    );
+
+    //returning the command
+    return new SequentialCommandGroup(
+      new InstantCommand(() -> swerveDriveSubsystem.resetOdometry(trajectory.getInitialPose())),
+      swerveCommand,
+      new InstantCommand(() -> swerveDriveSubsystem.shutdown())
+    );
+  }
+
   public void disabledLEDs() {
     ledSubsystem.disabled();
   }
@@ -335,9 +472,9 @@ public class RobotContainer {
     ledSubsystem.teleoperation();
   }
 
-  // public void autoLEDs() {
-  //   ledSubsystem.autonomous();
-  // }
+  public void autoLEDs() {
+    ledSubsystem.autonomous();
+  }
 
   /**
    * Returns whether the note has transitioned into the scorer

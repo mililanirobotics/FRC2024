@@ -22,6 +22,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 //misc
 import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.AprilTagsSubsystem.Pipeline;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -91,8 +92,8 @@ public final class Constants {
     public static final boolean kRightBackCANCoderReversed = false;
 
     // PID Constants
-    public static final double kTurningP = 0.4;
-    public static final double kTurningI = 0.001;
+    public static final double kTurningP = 0.5;
+    public static final double kTurningI = 0;
     public static final double kTurningD = 0;
     public static final double kTurningTolerance = 0.1;
 
@@ -166,17 +167,16 @@ public final class Constants {
 
   public static class LEDConstants {
     public static final int CANdleID = 30;
-    public static final int LEDcount = 69;
-    //69
+    public static final int LEDcount = 130; //69
   }
 
   //constants for the conveyor payload
   public static class IntakeConveyorConstants {
     //ports and directionality of conveyors
-    public static final int kLeftConveyorTopRollerPort = 7;
-    public static final int kRightConveyorBottomRollerPort = 12;
-    public static final boolean kLeftConveyorTopRollerReverse = true;
-    public static final boolean kRightConveyorBottomRollerReverse = false; 
+    public static final int kGreenRollerConveyorPort = 7;
+    public static final int kBlueRollerConveyorPort = 12;
+    public static final boolean kGreenRollerConveyorReverse = true;
+    public static final boolean kBlueRollerConveyorReverse = false; 
 
     //minimum joystick value to active conveyors
     public static final double kConveyorDeadband = 0.05;
@@ -197,22 +197,19 @@ public final class Constants {
 
     public static final double kTopRollerSpeed = 1;
     public static final double kBotRollerSpeed = 0.3;
-  }
 
-  //constants for the limelight
-  public static class LimeLightConstants {
-    public static final double kMountHeight = 0; //Placeholder
-    public static final double kMountAngle = 0; //Placeholder
-
-    public static final double kTargetAMPHeight = 52.25; // Height of the center of the AMP's AprilTag from the ground 
+    public static final double kMovingSpeed = 0.4;
   }
 
   public static class AprilTagConstants {
-    public static final double kPValue = 0.05;
+    public static final double kPValue = 1.5;
     public static final double kIValue = 0;
-    public static final double kDValue = 0.001;
+    public static final double kDValue = 0;
 
-    public static final double kTolerance = 0.005; // Tolerance of 0.05 radian offset for alignment
+    public static final double kTolerance = 0.01; // Tolerance of 0.05 radian offset for alignment
+
+    public static final Pipeline kDriverPipeline = Pipeline.DRIVER_VIEW;
+    public static final Pipeline kAmpPipeline = Pipeline.AMP_VIEW;
   }
 
   //constants for the extension
@@ -223,6 +220,12 @@ public final class Constants {
     public static final int kRightExtensionReverseChannel = 4;
   } 
 
+  public static class SwivelConstants {
+    public static final int kServoChannel = 0;
+    public static final int kDriverView = 180;
+    public static final int kAmpView = 100;
+  }
+
   //joystick constants and buttons
   public static class JoystickConstants {
     public static final int kPrimaryGamepadPort = 0;
@@ -230,7 +233,7 @@ public final class Constants {
     public static final int kTestingGamepadPort = 2;
 
     //Gamepad Axis Ports
-    public static final int kleftXJoystickPort = 0;
+    public static final int kLeftXJoystickPort = 0;
     public static final int kLeftYJoystickPort = 1;
     public static final int kRightXJoystickPort = 4;
     public static final int kRightYJoystickPort = 5; 
@@ -262,8 +265,8 @@ public final class Constants {
   public static class DriveConstants {
     // Drive Speed Constants
     public static final double kDriveMaxMetersPerSecond = 4.95;
-    public static final double kRotationMaxRadiansPerSecond = 0.5;
-    public static final double kDriveMetersPerSecondLimit = 1;
+    public static final double kRotationMaxRadiansPerSecond = 2 * Math.PI;
+    public static final double kDriveMetersPerSecondLimit = 3;
 
     public static final double kTeleDriveMaxAcceleration = kDriveMaxMetersPerSecond * 8;
     public static final double kTeleRotationMaxAngularAcceleration = kRotationMaxRadiansPerSecond * 8;
@@ -322,20 +325,28 @@ public final class Constants {
     public static final double kAutoDriveMaxRadiansPerSecond = 0.01;
     public static final double kAutoDriveMaxAngularAcceleration = kAutoDriveMaxRadiansPerSecond * 8;
 
-    //PID Constants
-    public static final double kPController = 8;
-    public static final double kIController = 0;
-    public static final double kDController = 0.000;
+    //WPLIB constants
+    public static final double kPXController = 8;
+    public static final double kIXController = 0;
+    public static final double kDXController = 0.000;
 
-<<<<<<< HEAD
-    public static final double kPThetaController = 7; //1.7
-    public static final double kIThetaController = 0; 
-    public static final double kDThetaController = 0.2;
-=======
-    public static final double kPThetaController = 0.65; //1.7
+    public static final double kPYController = 8;
+    public static final double kIYController = 0;
+    public static final double kDYController = 0.000;
+
+    public static final double kPThetaController = 8;
     public static final double kIThetaController = 0;
-    public static final double kDThetaController = 0.00;
->>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
+    public static final double kDThetaController = 0.000;
+
+
+    // //PID Constants
+    // public static final double kPController = 8;
+    // public static final double kIController = 0;
+    // public static final double kDController = 0.000;
+
+    // public static final double kPThetaController = 7; //1.7
+    // public static final double kIThetaController = 0; 
+    // public static final double kDThetaController = 0.2;
 
 
     //path planner constraint 
@@ -347,20 +358,15 @@ public final class Constants {
     );
     
     //max module speed
-<<<<<<< HEAD
     public static final double kMaxModuleSpeed = 2;
  
-=======
-    public static final double kMaxModuleSpeed = 0.4;
-
->>>>>>> 3c4af8a5c61c5a65996993c20a29aa895bfd454d
-    //Path planner config
-    public static final HolonomicPathFollowerConfig pathFollowingConfig = new HolonomicPathFollowerConfig(
-      new PIDConstants(kPController, kIController, kDController),
-      new PIDConstants(kPThetaController, kIThetaController, kDThetaController),
-      kMaxModuleSpeed, 
-      SwerveModuleConstants.translationLength.getNorm(),
-      new ReplanningConfig() 
-    );
+    // //Path planner config
+    // public static final HolonomicPathFollowerConfig pathFollowingConfig = new HolonomicPathFollowerConfig(
+    //   new PIDConstants(kPController, kIController, kDController),
+    //   new PIDConstants(kPThetaController, kIThetaController, kDThetaController),
+    //   kMaxModuleSpeed, 
+    //   SwerveModuleConstants.translationLength.getNorm(),
+    //   new ReplanningConfig() 
+    // );
   }
 }

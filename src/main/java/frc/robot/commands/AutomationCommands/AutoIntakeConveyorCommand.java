@@ -1,25 +1,22 @@
 package frc.robot.commands.AutomationCommands;
 
 import frc.robot.subsystems.IntakeConveyorSubsystem;
-import frc.robot.subsystems.ScoringSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class AutoIntakeConveyorCommand extends Command {
     //declaring subsystems
     private IntakeConveyorSubsystem m_intakeConveyorSubsystem;
-    private ScoringSubsystem m_scoringSubsystem;
     //declaring variables
     private boolean passedFront;
     private boolean passedBack;
     private boolean seenMiddle;
 
     //constructor
-    public AutoIntakeConveyorCommand(IntakeConveyorSubsystem intakeConveyorSubsystem, ScoringSubsystem scoringSubsystem) {
+    public AutoIntakeConveyorCommand(IntakeConveyorSubsystem intakeConveyorSubsystem) {
         //sets the condition to false everytime the command is ran\
         //initializing subsystems
         m_intakeConveyorSubsystem = intakeConveyorSubsystem;
-        m_scoringSubsystem = scoringSubsystem;
-        addRequirements(m_intakeConveyorSubsystem, m_scoringSubsystem);
+        addRequirements(m_intakeConveyorSubsystem);
     }
     
     @Override
@@ -29,7 +26,6 @@ public class AutoIntakeConveyorCommand extends Command {
         seenMiddle = false;
         System.out.println("Scoring command started");
         m_intakeConveyorSubsystem.setSpeeds(1);
-        m_scoringSubsystem.setSpeed(0.3, 0.3);
     }
 
     @Override
@@ -52,7 +48,7 @@ public class AutoIntakeConveyorCommand extends Command {
     @Override
     public void end(boolean interrupted) {
         m_intakeConveyorSubsystem.shutdown();
-        m_scoringSubsystem.shutdown();
+        m_intakeConveyorSubsystem.setNoteIn(true);
     }
 
     //in progress

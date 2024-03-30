@@ -11,28 +11,28 @@ import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.subsystems.AprilTagsSubsystem;
 import frc.robot.subsystems.SwerveDriveSubsystem;
 
-public class AlignmentTurningCommand extends Command{
+public class AlignmentTranslationalCommand extends Command{
     
     // Declared Subsystems
     private SwerveDriveSubsystem m_SwerveDriveSubsystem;
     private AprilTagsSubsystem m_AprilTagsSubsystem;
 
     // Declared PID
-    private PIDController AlignPID;
+    private PIDController translationalPID;
 
-    private double turningSpeed;
+    private double translationalSpeed;
     public double currentAngle;
 
-    public AlignmentTurningCommand(SwerveDriveSubsystem swerveDriveSubsystem, AprilTagsSubsystem aprilTagsSubsystem) {
+    public AlignmentTranslationalCommand(SwerveDriveSubsystem swerveDriveSubsystem, AprilTagsSubsystem aprilTagsSubsystem) {
         m_SwerveDriveSubsystem = swerveDriveSubsystem;
         m_AprilTagsSubsystem = aprilTagsSubsystem;
 
-        AlignPID = new PIDController(
+        translationalPID = new PIDController(
             AprilTagConstants.kPValue, AprilTagConstants.kIValue, AprilTagConstants.kDValue
         );
         
-        AlignPID.enableContinuousInput(-Math.PI, Math.PI);
-        AlignPID.setTolerance(AprilTagConstants.kTolerance);
+        translationalPID.enableContinuousInput(-Math.PI, Math.PI);
+        translationalPID.setTolerance(AprilTagConstants.kTolerance);
 
         addRequirements(m_SwerveDriveSubsystem, m_AprilTagsSubsystem);
     }
@@ -44,16 +44,16 @@ public class AlignmentTurningCommand extends Command{
     public void execute () {
         currentAngle = Math.toRadians(m_AprilTagsSubsystem.getHorizontalOffset());
 
-        turningSpeed = AlignPID.calculate(currentAngle, 0) * (-3);
+        translationalSpeed = translationalPID.calculate(currentAngle, 0) * (-3);
 
         /*
          * Minimal speed buffer for turning
          */
-        if (Math.abs(turningSpeed) < 0.1) {
-            turningSpeed = Math.copySign(0.1, turningSpeed);
+        if (Math.abs(translationalSpeed) < 0.1) {
+            translationalSpeed = Math.copySign(0.1, translationalSpeed);
         }
 
-        ChassisSpeeds targetSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(0, 0, turningSpeed, new Rotation2d(0));
+        ChassisSpeeds targetSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(0, translationalSpeed, 0, Rotation2d.fromDegrees(0));
 
         SwerveModuleState[] moduleStates = SwerveModuleConstants.kinematics.toSwerveModuleStates(targetSpeed);
         m_SwerveDriveSubsystem.setModuleStates(moduleStates);

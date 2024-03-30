@@ -1,21 +1,24 @@
 package frc.robot.commands.AutomationCommands;
 
 import frc.robot.Constants.ScoringConstants;
+import frc.robot.subsystems.IntakeConveyorSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class AutoScoringCommand extends Command {
     //declaring subsystems
     private ScoringSubsystem m_scoringSubsystem;
+    private IntakeConveyorSubsystem m_intakeConveyorSubsystem;
     //declaring variables
     private boolean passedFront;
     private boolean passedBack;
 
     //constructor
-    public AutoScoringCommand(ScoringSubsystem scoringSubsystem) {
+    public AutoScoringCommand(IntakeConveyorSubsystem intakeConveyorSubsystem, ScoringSubsystem scoringSubsystem) {
         //sets the condition to false everytime the command is ran
         //initializing subsystems
         m_scoringSubsystem = scoringSubsystem;
+        m_intakeConveyorSubsystem = intakeConveyorSubsystem;
         addRequirements(m_scoringSubsystem);
     }
     
@@ -44,7 +47,7 @@ public class AutoScoringCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        
+        m_intakeConveyorSubsystem.setNoteIn(false);
         m_scoringSubsystem.shutdown();
     }
 
@@ -54,4 +57,4 @@ public class AutoScoringCommand extends Command {
         //stops the command once the note has fully passed the IR sensor
         return passedBack && m_scoringSubsystem.getStopSensorReading();
     }
-}
+} 

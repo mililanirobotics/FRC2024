@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTable; 
 
 
@@ -13,8 +15,9 @@ public class AprilTagsSubsystem extends SubsystemBase{
         /**
          * Pipeline IDs are not set, thinking whether it matters if we need two pipelines for each AMP, driver view needs to be configured.
          */
-        RED_AMP(0), BLUE_AMP(1), DRIVER_VIEW(2);
-        
+        // RED_AMP(0), BLUE_AMP(1), DRIVER_VIEW(0);
+        DRIVER_VIEW(0), AMP_VIEW(7);
+
         private Pipeline(int PipelineID){
             this.PipelineID = PipelineID;
         }
@@ -65,5 +68,13 @@ public class AprilTagsSubsystem extends SubsystemBase{
     public void setPipeline(Pipeline pipeline) {
         table.getEntry("pipeline").setValue(pipeline.PipelineID);
     }
+
+     @Override
+    public void periodic() {
+        //prints the state of the pistons on Smartdashboard
+        SmartDashboard.putNumber("Tx Offset", getHorizontalOffset());
+        SmartDashboard.putNumber("Ty Offset", getVerticalOffset());
+
+    } 
 
 }

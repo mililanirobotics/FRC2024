@@ -16,6 +16,8 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
   //IR sensors
   private DigitalInput startIntakeConveyorSensor;
   private DigitalInput stopIntakeConveyorSensor;
+  //prevent two notes
+  private boolean isNoteIn;
 
   //constructor
   public IntakeConveyorSubsystem() {
@@ -28,6 +30,8 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
     //IR sensors
     startIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStartIntakeConveyorSensorPort);
     stopIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStopIntakeConveyorSensorPort);
+
+    isNoteIn = false;
   
   }
 
@@ -49,6 +53,18 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
    */
   public boolean getStopSensorReading() {
     return stopIntakeConveyorSensor.get();
+  }
+
+  public boolean getStopSensorReadingReverse() {
+    return !stopIntakeConveyorSensor.get();
+  }
+
+  public boolean isNoteIn() {
+    return isNoteIn;
+  }
+
+  public void setNoteIn(boolean isNoteInIntake) {
+    isNoteIn = isNoteInIntake;
   }
 
   /**

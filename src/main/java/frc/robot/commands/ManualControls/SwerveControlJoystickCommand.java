@@ -13,7 +13,7 @@ import frc.robot.Constants.SwerveModuleConstants;
 import frc.robot.Constants.DriveConstants;
 
 
-public class SwerveControlCommand extends Command{
+public class SwerveControlJoystickCommand extends Command{
     private ChassisSpeeds chassisSpeeds;
 
     // Declaring the Subsystem
@@ -25,7 +25,7 @@ public class SwerveControlCommand extends Command{
     private GenericHID joystickL;
     private GenericHID joystickR;
 
-    public SwerveControlCommand(SwerveDriveSubsystem swerveDriveSubsystem, GenericHID joystickL, GenericHID joystickR) {
+    public SwerveControlJoystickCommand(SwerveDriveSubsystem swerveDriveSubsystem, GenericHID joystickL, GenericHID joystickR) {
         m_SwerveDriveSubsystem = swerveDriveSubsystem;
         this.joystickL = joystickL;
         this.joystickR = joystickR;
@@ -42,8 +42,8 @@ public class SwerveControlCommand extends Command{
     public void execute() {
         // Grabs Joystick Inputs as Speed Inputs
         double xSpeed = joystickL.getRawAxis(JoystickConstants.kLeftYJoystickPort);
-        double ySpeed = joystickL.getRawAxis(JoystickConstants.kleftXJoystickPort);
-        double turningSpeed = joystickL.getRawAxis(2);
+        double ySpeed = joystickL.getRawAxis(JoystickConstants.kLeftXJoystickPort);
+        double turningSpeed = joystickR.getRawAxis(1);
 
         if(joystickR.getRawButton(1)) {
             xSpeed *= 0.25;
@@ -57,9 +57,9 @@ public class SwerveControlCommand extends Command{
         turningSpeed = Math.abs(turningSpeed) > JoystickConstants.kDeadzone ? turningSpeed : 0.0;
 
         //Limiting Drive Speeds Acceleration to be linear
-        xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kDriveMaxMetersPerSecond;
-        ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kDriveMaxMetersPerSecond;
-        turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kTeleRotationMaxAngularAcceleration;
+        xSpeed = xLimiter.calculate(xSpeed) * DriveConstants.kDriveMetersPerSecondLimit;
+        ySpeed = yLimiter.calculate(ySpeed) * DriveConstants.kDriveMetersPerSecondLimit;
+        turningSpeed = turningLimiter.calculate(turningSpeed) * DriveConstants.kRotationMaxRadiansPerSecond;
 
         // Creating desired chassis speeds from joystick inputs.
         chassisSpeeds = ChassisSpeeds.discretize(ChassisSpeeds.fromFieldRelativeSpeeds(

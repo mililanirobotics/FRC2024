@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.commands.LEDS.LowNoteSignalCommand;
-import frc.robot.commands.LEDS.MidNoteSignalCommand;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
@@ -201,22 +200,6 @@ public class LEDSubsystem extends SubsystemBase{
 
     public void clear() {
         m_candle.clearAnimation(0);
-    }
-
-    public ConditionalCommand NotePositionSignalCommand() {
-        return new ConditionalCommand(
-            new ConditionalCommand(
-                new LowNoteSignalCommand(this), 
-                new ConditionalCommand(
-                    new MidNoteSignalCommand(this), 
-                    null, 
-                    null
-                ), 
-                null
-            ), 
-            null,
-            null
-        );
     }
 
     @Override

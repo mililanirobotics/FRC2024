@@ -13,8 +13,6 @@ public class ExtensionSubsystem extends SubsystemBase {
     //solenoids
     private DoubleSolenoid leftExtension;
     private DoubleSolenoid rightExtension;
-    //checks if the solenoid is in the forward state
-    private boolean isExtended;
 
     //constructor
     public ExtensionSubsystem() {
@@ -36,7 +34,6 @@ public class ExtensionSubsystem extends SubsystemBase {
         //setting the default state to reverse
         leftExtension.set(Value.kForward);
         rightExtension.set(Value.kForward);
-        isExtended = false;
     }
 
     public DoubleSolenoid.Value getLeftState() {
@@ -51,29 +48,27 @@ public class ExtensionSubsystem extends SubsystemBase {
      * Retracts the extensions
      */
     public void retract() {
-        leftExtension.set(Value.kReverse);
-        rightExtension.set(Value.kReverse);
-        isExtended = false;
+        leftExtension.set(Value.kForward);
+        rightExtension.set(Value.kForward);
     }
 
     /**
      * Extends the extensions
      */
     public void extend() {
-        leftExtension.set(Value.kForward);
-        rightExtension.set(Value.kForward);
-        isExtended = true;
+        leftExtension.set(Value.kReverse);
+        rightExtension.set(Value.kReverse);
     }
 
     public boolean isExtended() {
-        return isExtended;
+        return leftExtension.get() == Value.kReverse && rightExtension.get() == Value.kReverse;
     }
   
     @Override
     public void periodic() {
         //prints the state of the pistons on Smartdashboard
-        SmartDashboard.putBoolean("is left extended", leftExtension.get() == Value.kForward);
-        SmartDashboard.putBoolean("is right extended", rightExtension.get() == Value.kForward);
+        SmartDashboard.putBoolean("is left extended", leftExtension.get() == Value.kReverse);
+        SmartDashboard.putBoolean("is right extended", rightExtension.get() == Value.kReverse);
 
     }
     
