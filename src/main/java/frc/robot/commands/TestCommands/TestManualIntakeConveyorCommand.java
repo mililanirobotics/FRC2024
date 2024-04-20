@@ -1,34 +1,49 @@
 package frc.robot.commands.TestCommands;
 
+//subsystems
 import frc.robot.subsystems.IntakeConveyorSubsystem;
+//commands
+import edu.wpi.first.wpilibj2.command.Command;
+//constants
+import frc.robot.Constants.JoystickConstants;
+//general imports
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-//general imports
-import frc.robot.Constants.JoystickConstants;
 
+/**
+ * Default command used to test the intake and conveyors 
+ */
 public class TestManualIntakeConveyorCommand extends Command {
     //declaring subsystems
     private IntakeConveyorSubsystem m_intakeConveyorSubsystem;
-
     //declaring the joystick used
     private GenericHID joystick;
-
     //speed of the conveyor
     private double intakeConveyorSpeed;
 
     //constructor
     public TestManualIntakeConveyorCommand(GenericHID joystick, IntakeConveyorSubsystem intakeConveyorSubsystem) {
+        //initializing hardware and variables
         this.joystick = joystick;
-        m_intakeConveyorSubsystem = intakeConveyorSubsystem;
         intakeConveyorSpeed = 0;
-
+        //initializing subsystems 
+        m_intakeConveyorSubsystem = intakeConveyorSubsystem;
         addRequirements(m_intakeConveyorSubsystem);
     }
     
     @Override
     public void execute() { 
-        //sets the conveyor speed based on the secondary gamepad's left joystick value
+
+        /**
+         * Controls: 
+         *  A = both speeds +0.1
+         *  B = both speeds +0.05
+         *  X = both speeds -0.1
+         *  Y = both speeds -0.05
+         * 
+         *  Start buttom = sets the speeds of the motor
+         *  Back button = both speeds 0
+         */
         if(joystick.getRawButtonPressed(JoystickConstants.kAButtonPort)     
         ) {
             intakeConveyorSpeed += 0.1;
@@ -59,10 +74,10 @@ public class TestManualIntakeConveyorCommand extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        //shutting down motors
         m_intakeConveyorSubsystem.shutdown();
     }
 
-    //in progress
     @Override
     public boolean isFinished() {
         return false;

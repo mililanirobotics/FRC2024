@@ -1,42 +1,43 @@
 package frc.robot.commands.ManualControls;
 
-import frc.robot.Constants.SwivelConstants;
+//subsystems
 import frc.robot.subsystems.SwivelSubsystem;
+//commands
 import edu.wpi.first.wpilibj2.command.Command;
+//constants
+import frc.robot.Constants.SwivelConstants;
 
+/**
+ * Sets the angle/view of the servo to the amp 
+ */
 public class SetSwivelToAmpCommand extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
+  //declaring subsystems
   private SwivelSubsystem m_swivelSubsystem;
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
+  //constructor
   public SetSwivelToAmpCommand(SwivelSubsystem swivelSubsystem) {
+    //initializing subsystems 
     m_swivelSubsystem = swivelSubsystem;
-
-    // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(m_swivelSubsystem);
   }
 
-  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    //printing an initialize statement 
     System.out.println("Setting servo to amp view");
+    //setting the angle of the servo
     m_swivelSubsystem.setAngle(SwivelConstants.kAmpView);
   }
 
-
-  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    //printing an update
     System.out.println("Servo in amp view");
   }
 
-  // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    //ends the command once the servo's angle matches that of the constant
     return m_swivelSubsystem.getAngle() == SwivelConstants.kAmpView;
   }
 }

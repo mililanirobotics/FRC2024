@@ -1,31 +1,33 @@
 package frc.robot.commands.TestCommands;
 
-//subsystems and commands
+//subsystems
 import frc.robot.subsystems.ScoringSubsystem;
+//commands
+import edu.wpi.first.wpilibj2.command.Command;
+//constants
+import frc.robot.Constants.JoystickConstants;
+//general imports
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 
-//general imports
-import frc.robot.Constants.JoystickConstants;
-
+/**
+ * Default command used to test the individual scoring motors 
+ */
 public class TestManualScoringCommand extends Command {
     //declaring subsystems
     private ScoringSubsystem m_scoringSubsystem;
-
     //declaring the joystick used
     private GenericHID joystick;
-
     //physical constants
     private double topLaunchRollerSpeed;
     private double bottomLaunchRollerSpeed;
 
     //constructor
     public TestManualScoringCommand(GenericHID joystick, ScoringSubsystem scoringSubsystem) {
+        //initializing hardware and variables
         this.joystick = joystick;
         topLaunchRollerSpeed = 0;
         bottomLaunchRollerSpeed = 0;
-
         //initializing subsystems
         m_scoringSubsystem = scoringSubsystem;
         addRequirements(m_scoringSubsystem);
@@ -50,7 +52,8 @@ public class TestManualScoringCommand extends Command {
          *  X + left bumper = top roller speed -0.1
          *  Y + left bumper = top roller speed -0.05
          * 
-         *  Start buttom = both speeds set to 0
+         *  Start button = sets the speeds of the motors
+         *  Back button = both speeds set to 0
          */
         if(joystick.getRawButton(JoystickConstants.kRightBumperPort)
             && joystick.getRawButtonPressed(JoystickConstants.kAButtonPort) 
@@ -113,14 +116,15 @@ public class TestManualScoringCommand extends Command {
             topLaunchRollerSpeed = 0;
         }
 
-        //prints the speed of the launch motors
-        SmartDashboard.putNumber("Top launch roller speed", topLaunchRollerSpeed);
-        SmartDashboard.putNumber("Bottom launch roller speed", bottomLaunchRollerSpeed);
-        SmartDashboard.updateValues();
-
+        //sets the speeds 
         if(joystick.getRawButtonPressed(JoystickConstants.kStartButtonPort)) {
             m_scoringSubsystem.setSpeed(bottomLaunchRollerSpeed, topLaunchRollerSpeed);
         }
+
+        //puts speeds on SmartDashboard
+        SmartDashboard.putNumber("Top launch roller speed", topLaunchRollerSpeed);
+        SmartDashboard.putNumber("Bottom launch roller speed", bottomLaunchRollerSpeed);
+        SmartDashboard.updateValues();
     }
 
     @Override

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.List;
+
 //path planner
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -56,7 +58,7 @@ public final class Constants {
     public static final int kRightFrontRotationPort = 8;
 
     public static final int kLeftBackWheelPort = 19;
-    public static final int kLeftBackRotationPort = 18;
+    public static final int kLeftBackRotationPort = 17;
 
     public static final int kRightBackWheelPort = 21;
     public static final int kRightBackRotationPort = 20;
@@ -65,10 +67,10 @@ public final class Constants {
     public static final int kRightFrontCANCoderPort = 11;
     public static final int kLeftBackCANCoderPort = 17;
     public static final int kRightBackCANCoderPort = 2;
-    public static final double kLeftFrontCANCoderOffset = -0.181396484375;
-    public static final double kRightFrontCANCoderOffset = -0.7412109375;
-    public static final double kLeftBackCANCoderOffset = -0.555419921875;
-    public static final double kRightBackCANCoderOffset = -0.326904296875;
+    public static final double kLeftFrontCANCoderOffset = -0.026851;
+    public static final double kRightFrontCANCoderOffset = -0.2412109375;
+    public static final double kLeftBackCANCoderOffset = -0.055419921875;
+    public static final double kRightBackCANCoderOffset = -0.826904296875;
 
     public static final int kLeftBackIndex = 2;
     public static final int kRightBackIndex = 3;
@@ -92,14 +94,14 @@ public final class Constants {
     public static final boolean kRightBackCANCoderReversed = false;
 
     // PID Constants
-    public static final double kTurningP = 0.5;
+    public static final double kTurningP = 0.3;
     public static final double kTurningI = 0;
     public static final double kTurningD = 0;
     public static final double kTurningTolerance = 0.1;
 
     // The distances between each Module from the center of the robot (Meters)
     public static final double kModuleDistance = 0.312547;
-
+    
     // 2d translation coordinates relative to center 
     public static final double kLeftFront2dX = kModuleDistance;
     public static final double kLeftFront2dY = kModuleDistance;
@@ -202,11 +204,11 @@ public final class Constants {
   }
 
   public static class AprilTagConstants {
-    public static final double kPValue = 1.5;
+    public static final double kPValue = 0.5;
     public static final double kIValue = 0;
     public static final double kDValue = 0;
 
-    public static final double kTolerance = 0.01; // Tolerance of 0.05 radian offset for alignment
+    public static final double kTolerance = 0.03; // Tolerance of 0.05 radian offset for alignment
 
     public static final Pipeline kDriverPipeline = Pipeline.DRIVER_VIEW;
     public static final Pipeline kAmpPipeline = Pipeline.AMP_VIEW;
@@ -222,8 +224,15 @@ public final class Constants {
 
   public static class SwivelConstants {
     public static final int kServoChannel = 0;
-    public static final int kDriverView = 180;
+    public static final int kDriverView = 120;
     public static final int kAmpView = 100;
+  }
+
+  public static class HangConstants {
+    public static final int kHangPort = 18;
+    public static final boolean kHangReverse = false;
+    public static final int kHangSensorPort = 7;
+    public static final double kTolerance = 0.1;
   }
 
   //joystick constants and buttons
@@ -256,6 +265,7 @@ public final class Constants {
 
     //Dpad values
     public final static int kDpadUp = 0;
+    public final static int kDpadRight = 90;
     public final static int kDpadDown = 180;
 
     public final static double kDeadzone = 0.2;
@@ -266,7 +276,7 @@ public final class Constants {
     // Drive Speed Constants
     public static final double kDriveMaxMetersPerSecond = 4.95;
     public static final double kRotationMaxRadiansPerSecond = 2 * Math.PI;
-    public static final double kDriveMetersPerSecondLimit = 3;
+    public static final double kDriveMetersPerSecondLimit = 1;//4.5;
 
     public static final double kTeleDriveMaxAcceleration = kDriveMaxMetersPerSecond * 8;
     public static final double kTeleRotationMaxAngularAcceleration = kRotationMaxRadiansPerSecond * 8;
@@ -320,33 +330,33 @@ public final class Constants {
   //constants for auto paths
   public static class AutoConstants {
     //auto constraints 
-    public static final double kAutoDriveMaxMetersPerSecond = 0.05;
+    public static final double kAutoDriveMaxMetersPerSecond = 3;
     public static final double kAutoDriveMaxAcceleration = kAutoDriveMaxMetersPerSecond * 8;
-    public static final double kAutoDriveMaxRadiansPerSecond = 0.01;
+    public static final double kAutoDriveMaxRadiansPerSecond = 1;
     public static final double kAutoDriveMaxAngularAcceleration = kAutoDriveMaxRadiansPerSecond * 8;
 
     //WPLIB constants
-    public static final double kPXController = 8;
+    public static final double kPXController = 1.5;
     public static final double kIXController = 0;
-    public static final double kDXController = 0.000;
+    public static final double kDXController = 0;
 
-    public static final double kPYController = 8;
+    public static final double kPYController = 1.5;
     public static final double kIYController = 0;
-    public static final double kDYController = 0.000;
+    public static final double kDYController = 0;
 
-    public static final double kPThetaController = 8;
+    public static final double kPThetaController = 3;
     public static final double kIThetaController = 0;
-    public static final double kDThetaController = 0.000;
+    public static final double kDThetaController = 0;
 
 
-    // //PID Constants
-    // public static final double kPController = 8;
-    // public static final double kIController = 0;
-    // public static final double kDController = 0.000;
+    //PID Constants
+    public static final double kPController = 16;
+    public static final double kIController = 0;
+    public static final double kDController = 0;
 
-    // public static final double kPThetaController = 7; //1.7
-    // public static final double kIThetaController = 0; 
-    // public static final double kDThetaController = 0.2;
+    public static final double kPThetaControllerP = 0.08;
+    public static final double kIThetaControllerP = 0.0; 
+    public static final double kDThetaControllerP = 0.001;
 
 
     //path planner constraint 
@@ -361,12 +371,16 @@ public final class Constants {
     public static final double kMaxModuleSpeed = 2;
  
     // //Path planner config
-    // public static final HolonomicPathFollowerConfig pathFollowingConfig = new HolonomicPathFollowerConfig(
-    //   new PIDConstants(kPController, kIController, kDController),
-    //   new PIDConstants(kPThetaController, kIThetaController, kDThetaController),
-    //   kMaxModuleSpeed, 
-    //   SwerveModuleConstants.translationLength.getNorm(),
-    //   new ReplanningConfig() 
-    // );
+    public static final HolonomicPathFollowerConfig pathFollowingConfig = new HolonomicPathFollowerConfig(
+      new PIDConstants(kPController, kIController, kDController),
+      new PIDConstants(kPThetaControllerP, kIThetaControllerP, kDThetaControllerP),
+      kAutoDriveMaxMetersPerSecond, 
+      SwerveModuleConstants.leftFrontLocation.getNorm(),
+      new ReplanningConfig(true, true) 
+    );
+
+    public static final List<Translation2d> testPath = List.of(
+      new Translation2d(1, 0)
+    );
   }
 }

@@ -10,6 +10,7 @@ import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.CANdle.VBatOutputMode;
+import com.ctre.phoenix.led.LarsonAnimation.BounceMode;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.LarsonAnimation;
@@ -33,6 +34,8 @@ public class LEDSubsystem extends SubsystemBase{
     private double brightness;
     private double ledAnimSpeed;
     private int ledOffset;
+    private int ledPocket;
+    private BounceMode bounce;
     private boolean ledReversed;
     private Color ledColor = new Color(0, 0, 0);
     private int ledWhite;
@@ -120,6 +123,16 @@ public class LEDSubsystem extends SubsystemBase{
         return this;
     }
 
+    public LEDSubsystem setPocket(int pocket) {
+        ledPocket = pocket;
+        return this;
+    }
+
+    public LEDSubsystem setBounce(BounceMode bounce) {
+        this.bounce = bounce;
+        return this;
+    }
+
     public void setAnimation(animations animation) {
         switch(animation) {
             case SET_ALL:
@@ -134,7 +147,7 @@ public class LEDSubsystem extends SubsystemBase{
 
             case LARSON_ANIM:
                 clear();
-                currentAnimation = new LarsonAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, null, ledOffset);
+                currentAnimation = new LarsonAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, bounce, ledPocket);
                 break;
 
             case RAINBOW_ANIM:
@@ -180,6 +193,10 @@ public class LEDSubsystem extends SubsystemBase{
         setAnimSpeed(.5);
         setOffset(0);
         setAnimation(animations.RAINBOW_ANIM);
+        // setBrightness(1);
+        // setAnimSpeed(.5);
+        // setColor(new Color(0, 150, 255));
+        // setAnimation(animations.SINGLE_FADE_ANIM);
     }
 
     public void autonomous() {
@@ -192,6 +209,10 @@ public class LEDSubsystem extends SubsystemBase{
 
     public void disabled() {
         clear();
+        // setBrightness(1);
+        // setAnimSpeed(.5);
+        // setOffset(0);
+        // setAnimation(animations.RAINBOW_ANIM);
         setBrightness(1);
         setAnimSpeed(.5);
         setColor(new Color(255, 30, 0));

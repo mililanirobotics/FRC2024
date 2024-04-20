@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 //path planner
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.util.PathPlannerLogging;
 //constants
 import frc.robot.Constants.AutoConstants;
@@ -35,6 +37,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     //Navx and odometry
     private AHRS navX;
     private SwerveDriveOdometry odometry;
+    private SwerveDrivePoseEstimator poseEstimator;
     //Field2d 
     private Field2d field;
     //position translational 
@@ -118,30 +121,24 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         navX.enableLogging(true);
         navX.reset();
 
+        poseEstimator = new SwerveDrivePoseEstimator(
+            SwerveModuleConstants.kinematics,
+            /*getYawRotation(),*/
+            getRotation2dDegContinuous(),
+            getModulePosition(),
+            new Pose2d()
+        );
+
         //initializing odometry that uses continuous 360 degree input
         odometry = new SwerveDriveOdometry(
             SwerveModuleConstants.kinematics, 
-            getRotation2dDegContinuous(),
+            /*(Rotation2d.fromDegrees(getYawReverse()),*/
+            getPoseEstimated().getRotation(),
             getModulePosition()
         );
 
-        //initializing AutoBuilder to create path planner autopaths
-        //flips the created autopath if on the Red Alliance
-        // AutoBuilder.configureHolonomic(
-        //     this::getPose, 
-        //     this::resetOdometry, 
-        //     this::getSpeeds, 
-        //     this::driveRobotRelative, 
-        //     AutoConstants.pathFollowingConfig, 
-        //     () -> {
-        //         var alliance = DriverStation.getAlliance();
-        //         if(alliance.isPresent()) { 
-        //             return alliance.get() == DriverStation.Alliance.Red;
-        //         }
-        //         return false;
-        //     },
-        //     this
-        // );
+        //configuring path planner
+        configurePathPlanner();
 
         //Path Planner logging
         field = new Field2d();
@@ -202,6 +199,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     // gyro and accelorometer methods
     //===========================================================================
 
+
     /**
      * Resets the current angle of the gyro to 0. 
      * Tells the driver that the gyro is connected via a print statement
@@ -218,6 +216,15 @@ public class SwerveDriveSubsystem extends SubsystemBase {
     public double getYaw() {
         return navX.getYaw();
     }
+
+    public Rotation2d getYawRotation() {
+        return Rotation2d.fromDegrees(getYaw());
+    }
+
+    public double getYawReverse() {
+        return -navX.getYaw();
+    }
+
 
     /**
      * Gets the current pitch angle from the navx gyro
@@ -259,6 +266,10 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(getYaw());
     }
 
+    public Rotation2d getRotation2dRev() {
+        return Rotation2d.fromRadians(Units.degreesToRadians(-getYaw()));
+    }
+
     /**
      * Returns a Rotation2d object from -π to π radian rotation
      * @return The radian Rotation2d object
@@ -272,7 +283,8 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      * @return The adjusted degrees
      */
     public double getDegrees() {
-        double rawDegrees = -getYaw();
+        double rawDegrees = -getYaw() - 180;
+        rawDegrees = rawDegrees % 360;
         return rawDegrees < 0 ? rawDegrees + 360 : rawDegrees;
     }
 
@@ -295,7 +307,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         //sets drive constants to the states
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kDriveMaxMetersPerSecond);
+        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kDriveMetersPerSecondLimit);
         //sets the states
         leftFrontModule.setSwerveState(desiredStates[0]);
         rightFrontModule.setSwerveState(desiredStates[1]);
@@ -351,9 +363,13 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      * @param robotRelativeSpeed The robot relative ChassisSpeed object
      */
     public void driveRobotRelative(ChassisSpeeds robotRelativeSpeed) {
-        ChassisSpeeds targetSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeed, getRotation2dDeg());
-        targetSpeeds = ChassisSpeeds.discretize(targetSpeeds, 0.02);    
+        // ChassisSpeeds targetSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(robotRelativeSpeed, getRotation2dRev());
+        // targetSpeeds = ChassisSpeeds.discretize(targetSpeeds, 0.02);    
 
+        // SwerveModuleState[] targetState = SwerveModuleConstants.kinematics.toSwerveModuleStates(targetSpeeds);
+        // setModuleStates(targetState);
+
+        ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeed, 0.02);
         SwerveModuleState[] targetState = SwerveModuleConstants.kinematics.toSwerveModuleStates(targetSpeeds);
         setModuleStates(targetState);
     }
@@ -362,16 +378,37 @@ public class SwerveDriveSubsystem extends SubsystemBase {
      * Sets the power of the conveyor motors to 0
      */
     public void shutdown() {
-        leftFrontModule.shutdown();
-        rightFrontModule.shutdown();
-        leftBackModule.shutdown();
-        rightBackModule.shutdown();
+        driveRobotRelative(new ChassisSpeeds());
+        // leftFrontModule.shutdown();
+        // rightFrontModule.shutdown();
+        // leftBackModule.shutdown();
+        // rightBackModule.shutdown();
     }
 
     //=========================================================================== 
     // misc methods
     //===========================================================================
     
+    public void configurePathPlanner() {
+        //initializing AutoBuilder to create path planner autopaths
+        //flips the created autopath if on the Red Alliance
+        AutoBuilder.configureHolonomic(
+            this::getPose, 
+            this::resetOdometry, 
+            this::getSpeeds, 
+            this::driveRobotRelative, 
+            AutoConstants.pathFollowingConfig, 
+            () -> {
+                var alliance = DriverStation.getAlliance();
+                if(alliance.isPresent()) { 
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
+            },
+            this
+        );
+    }
+
     /**
      * Returns the recorded odometry position of the robot on the field 
      * @return
@@ -380,12 +417,19 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         return odometry.getPoseMeters();
     }
 
+    public Pose2d getPoseEstimated() {
+        return poseEstimator.getEstimatedPosition();
+    }
+
     /**
      * Resets the odometry object; sets its position based on the robot's current rotation and position
      * @param pose The current position of the robot
      */
     public void resetOdometry(Pose2d pose) {
-        odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePosition(), pose);
+        // odometry.resetPosition(getYawRotation(), getModulePosition(), pose);
+        // poseEstimator.resetPosition(getYawRotation(), getModulePosition(), pose);
+        odometry.resetPosition(getRotation2dDegContinuous(), getModulePosition(), pose);
+        poseEstimator.resetPosition(getRotation2dDegContinuous(), getModulePosition(), pose);
     }
 
     /**
@@ -423,14 +467,21 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         //odometry 
         // odometryPos.setValue(odometry.getPoseMeters());
         //gyro
-        gyroData.setValue(getYaw());
+        gyroData.setValue(getDegrees());
     }
 
     @Override
     public void periodic() {
         //updates odometry
         odometry.update(
-            Rotation2d.fromDegrees(getYaw()),
+            /*getYawRotation(),*/
+            getRotation2dDegContinuous(),
+            getModulePosition()
+        );
+
+        poseEstimator.update(
+            /*getYawRotation(),*/
+            getRotation2dDegContinuous(),
             getModulePosition()
         );
 

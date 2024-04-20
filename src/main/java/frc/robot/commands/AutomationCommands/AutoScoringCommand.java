@@ -1,10 +1,19 @@
 package frc.robot.commands.AutomationCommands;
 
-import frc.robot.Constants.ScoringConstants;
+//subsystems
 import frc.robot.subsystems.IntakeConveyorSubsystem;
 import frc.robot.subsystems.ScoringSubsystem;
+//commands
 import edu.wpi.first.wpilibj2.command.Command;
+//constants
+import frc.robot.Constants.ScoringConstants;
 
+
+/**
+ * Automatically scores the note once aligned with the amp.
+ * Tracks the state of the note through the IR sensor mounted in the hood, 
+ * allowing for automatic starting/stopping of the payload
+ */
 public class AutoScoringCommand extends Command {
     //declaring subsystems
     private ScoringSubsystem m_scoringSubsystem;
@@ -24,9 +33,12 @@ public class AutoScoringCommand extends Command {
     
     @Override
     public void initialize() {
+        //setting all states to false by default
         passedFront = false;
         passedBack = false;
+        //printing initialize statement 
         System.out.println("Scoring command started");
+        //turning on scorer
         m_scoringSubsystem.setSpeed(ScoringConstants.kBotRollerSpeed, ScoringConstants.kTopRollerSpeed);
     }
 
@@ -39,19 +51,16 @@ public class AutoScoringCommand extends Command {
         if (passedFront && m_scoringSubsystem.getStopSensorReading()) {
             passedBack = true;
         }
-
-        System.out.println("Sensor Reading: "+m_scoringSubsystem.getStopSensorReading());
-        System.out.println("Passed Front: "+passedFront);
-        System.out.println("Passed Back: "+passedBack);
     }
 
     @Override
     public void end(boolean interrupted) {
+        //shutting down the scorer and updating the state of the note in the robot
         m_intakeConveyorSubsystem.setNoteIn(false);
+        m_intakeConveyorSubsystem.setNotePayload(false);
         m_scoringSubsystem.shutdown();
     }
 
-    //in progress
     @Override
     public boolean isFinished() {
         //stops the command once the note has fully passed the IR sensor

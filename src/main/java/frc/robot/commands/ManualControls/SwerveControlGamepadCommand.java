@@ -41,12 +41,12 @@ public class SwerveControlGamepadCommand extends Command{
         // Grabs Joystick Inputs as Speed Inputs
         double xSpeed = gamepad.getRawAxis(JoystickConstants.kLeftYJoystickPort);
         double ySpeed = gamepad.getRawAxis(JoystickConstants.kLeftXJoystickPort);
-        double turningSpeed = gamepad.getRawAxis(JoystickConstants.kRightXJoystickPort);
+        double turningSpeed = -gamepad.getRawAxis(JoystickConstants.kRightXJoystickPort);
 
         if(gamepad.getRawAxis(JoystickConstants.kRightTriggerPort) >= 0.5) {
-            xSpeed *= 0.5;
-            ySpeed *= 0.5;
-            turningSpeed *= 0.5;
+            xSpeed *= 0.3;
+            ySpeed *= 0.3;
+            turningSpeed *= 0.3;
         }
         
         // Apply Deadband to prevent motors accidentally spinning

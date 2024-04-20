@@ -28,6 +28,6 @@ public class RaiseExtensionCommand extends Command {
     //in progress
     @Override
     public boolean isFinished() {
-        return m_extensionSubsystem.getLeftState() == Value.kForward && m_extensionSubsystem.getRightState() == Value.kForward;
+        return m_extensionSubsystem.getLeftState() == Value.kReverse && m_extensionSubsystem.getRightState() == Value.kReverse;
     }
 }

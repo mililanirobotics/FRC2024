@@ -58,7 +58,10 @@ public class AprilTagsSubsystem extends SubsystemBase{
 
 
     public boolean isAmpAligned() {
-        return getHorizontalOffset() < 100 && getVerticalOffset() < 100;
+        if (isTargetFound()) {
+            return getHorizontalOffset() < 100 && getVerticalOffset() < 100;
+        }
+        return false;
     }
 
     /**

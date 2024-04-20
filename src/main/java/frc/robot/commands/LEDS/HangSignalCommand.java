@@ -5,10 +5,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.LEDSubsystem.animations;
 
-public class HighNoteSignalCommand extends Command {
+public class HangSignalCommand extends Command {
     private final LEDSubsystem m_LedSubsystem;
 
-    public HighNoteSignalCommand(LEDSubsystem m_LedSubsystem) {
+    public HangSignalCommand(LEDSubsystem m_LedSubsystem) {
         this.m_LedSubsystem = m_LedSubsystem;
         addRequirements(m_LedSubsystem);
     }
@@ -18,7 +18,7 @@ public class HighNoteSignalCommand extends Command {
     public void initialize() {
         m_LedSubsystem.clear();
         m_LedSubsystem
-            .setColor(new Color(255, 0, 255))
+            .setColor(new Color(0, 255, 0))
             .setAnimation(animations.SET_ALL);
     }
 

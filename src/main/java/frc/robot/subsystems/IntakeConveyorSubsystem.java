@@ -18,6 +18,7 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
   private DigitalInput stopIntakeConveyorSensor;
   //prevent two notes
   private boolean isNoteIn;
+  private boolean isNotePayload;
 
   //constructor
   public IntakeConveyorSubsystem() {
@@ -31,8 +32,7 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
     startIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStartIntakeConveyorSensorPort);
     stopIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStopIntakeConveyorSensorPort);
 
-    isNoteIn = false;
-  
+    isNoteIn = true;
   }
 
   /**
@@ -63,8 +63,26 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
     return isNoteIn;
   }
 
+  public boolean isNotePayload() {
+    return isNotePayload;
+  }
+
+  public int getNotePosition() {
+    if (isNoteIn && isNotePayload) {
+      return 3;
+    }
+    if (isNoteIn) {
+      return 1;
+    }
+    return 0;
+  }
+
   public void setNoteIn(boolean isNoteInIntake) {
     isNoteIn = isNoteInIntake;
+  }
+
+  public void setNotePayload(boolean isNoteInPayload) {
+    isNotePayload = isNoteInPayload;
   }
 
   /**
@@ -89,5 +107,7 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
     //prints the state of the IR sensors on Smartdashboard
     SmartDashboard.putBoolean("Start Sensor Triggered", getStartSensorReading());
     SmartDashboard.putBoolean("Stop Sensor Triggered", getStopSensorReading());
+    SmartDashboard.putBoolean("InRobot", isNoteIn());
+    SmartDashboard.putBoolean("InPayload", isNotePayload());
   }
 }
