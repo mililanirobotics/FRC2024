@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
-import frc.robot.commands.LEDS.LowNoteSignalCommand;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
@@ -31,18 +30,17 @@ public class LEDSubsystem extends SubsystemBase{
     private final int ledCount = LEDConstants.LEDcount;
 
     private boolean mutliplePatterns = false;
+    private boolean animationOn = false;
     private double brightness;
     private double ledAnimSpeed;
     private int ledOffset;
-    private int ledPocket;
-    private BounceMode bounce;
+    private int ledPocket = 1;
+    private BounceMode bounce = BounceMode.Center;
     private boolean ledReversed;
     private Color ledColor = new Color(0, 0, 0);
     private int ledWhite;
 
     private int tempVarDeleteLaterPlease = 0;
-    
-    private Animation currentAnimation = null;
 
     public enum animations {
         SET_ALL,
@@ -62,10 +60,16 @@ public class LEDSubsystem extends SubsystemBase{
         configAll.statusLedOffWhenActive = true;
         configAll.disableWhenLOS = false;
         configAll.stripType = LEDStripType.RGB;
-        configAll.brightnessScalar = 0.1;
+        configAll.brightnessScalar = 1;
         configAll.vBatOutputMode = VBatOutputMode.Modulated;
         configAll.v5Enabled = true;
         m_candle.configAllSettings(configAll, 100);
+
+        clear();
+        // setColor(new Color(255, 0, 0));
+        // setBrightness(1);
+        // setAnimSpeed(0.25);
+        // larsonAnimation();
 
         // setLEDs(0, 0, 100);
         // m_candle.animate(new RainbowAnimation(1, 0.5, 16, false, 0));
@@ -133,58 +137,45 @@ public class LEDSubsystem extends SubsystemBase{
         return this;
     }
 
-    public void setAnimation(animations animation) {
-        switch(animation) {
-            case SET_ALL:
-                clear();
-                currentAnimation = null;
-                break;
+    public void disableAnimation() {
+        clear();
+        animationOn = false;
+    }
 
-            case FIRE_ANIM:
-                clear();
-                currentAnimation = new FireAnimation(brightness, ledAnimSpeed, ledCount, 1, 1, ledReversed, ledOffset);
-                break;
+    public void fireAnimation() {
+        m_candle.animate(new FireAnimation(brightness, ledAnimSpeed, ledCount, 1, 1, ledReversed, ledOffset), 0);
+    }
 
-            case LARSON_ANIM:
-                clear();
-                currentAnimation = new LarsonAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, bounce, ledPocket);
-                break;
+    public void larsonAnimation() {
+        m_candle.animate(new LarsonAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, bounce, ledPocket), 0);
+    }
+    
+    public void rainbowAnimation() {
+        m_candle.animate(new RainbowAnimation(brightness, ledAnimSpeed, ledCount, ledReversed, ledOffset), 0);
+    }
 
-            case RAINBOW_ANIM:
-                clear();
-                currentAnimation = new RainbowAnimation(brightness, ledAnimSpeed, ledCount, ledReversed, ledOffset);
-                break;
+    public void rgbFadeAnimation() {
+        m_candle.animate(new RgbFadeAnimation(brightness, ledAnimSpeed, ledCount, ledOffset), 0);
+    }
 
-            case RGB_FADE_ANIM: 
-                clear();
-                currentAnimation = new RgbFadeAnimation(brightness, ledAnimSpeed, ledCount, ledOffset);
-                break;
+    public void singleFadeAnimation() {
+        m_candle.animate(new SingleFadeAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, ledOffset), 0);
+    }
 
-            case SINGLE_FADE_ANIM:
-                clear();
-                currentAnimation = new SingleFadeAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, ledOffset);
-                break;
+    public void strobeAnimation() {
+        m_candle.animate(new StrobeAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, ledOffset), 0);
+    }
 
-            case STROBE_ANIM:
-                clear();
-                currentAnimation = new StrobeAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, ledOffset);
-                break;
+    public void colorFlowAnimation() {
+        m_candle.animate(new ColorFlowAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, null, ledOffset), 0);
+    }
 
-            case COLOR_FLOW_ANIM:
-                clear();
-                currentAnimation = new ColorFlowAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, null, ledOffset);
-                break;
+    public void twinkleOffAnimation() {
+        m_candle.animate(new TwinkleOffAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, null, ledOffset), 0);
+    }
 
-            case TWINKLE_OFF_ANIM:
-                clear();
-                currentAnimation = new TwinkleOffAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, null, ledOffset);
-                break;
-
-            case TWINKLE_ANIM:
-                clear();
-                currentAnimation = new TwinkleAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, null, ledOffset);
-                break;
-        }
+    public void twinkleAnimation() {
+        m_candle.animate(new TwinkleAnimation(getR(ledColor), getG(ledColor), getB(ledColor), ledWhite, ledAnimSpeed, ledCount, null, ledOffset), 0);
     }
 
     public void teleoperation() {
@@ -192,7 +183,7 @@ public class LEDSubsystem extends SubsystemBase{
         setBrightness(1);
         setAnimSpeed(.5);
         setOffset(0);
-        setAnimation(animations.RAINBOW_ANIM);
+        rainbowAnimation();
         // setBrightness(1);
         // setAnimSpeed(.5);
         // setColor(new Color(0, 150, 255));
@@ -204,7 +195,7 @@ public class LEDSubsystem extends SubsystemBase{
         setBrightness(1);
         setAnimSpeed(.5);
         setOffset(0);
-        setAnimation(animations.LARSON_ANIM);
+        larsonAnimation();
     }
 
     public void disabled() {
@@ -216,7 +207,7 @@ public class LEDSubsystem extends SubsystemBase{
         setBrightness(1);
         setAnimSpeed(.5);
         setColor(new Color(255, 30, 0));
-        setAnimation(animations.SINGLE_FADE_ANIM);  
+        singleFadeAnimation();  
     }
 
     public void clear() {
@@ -225,17 +216,6 @@ public class LEDSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
-
-        if (!mutliplePatterns) {
-            if (currentAnimation == null) {
-                m_candle.setLEDs(getR(ledColor), getG(ledColor), getB(ledColor));
-            }
-            else {
-                m_candle.animate(currentAnimation);
-            }
-        }
-
-        
         SmartDashboard.putNumber("LED_R", getR(ledColor));
         SmartDashboard.putNumber("LED_G", getG(ledColor));
         SmartDashboard.putNumber("LED_B", getB(ledColor));

@@ -25,6 +25,9 @@ public class ScoringSubsystem extends SubsystemBase {
     //setting directionality 
     topLaunchRoller.setInverted(ScoringConstants.kUpperFlywheelReverse);
     bottomLaunchRoller.setInverted(ScoringConstants.kLowerFlywheelReverse);
+    //setting brake mode
+    topLaunchRoller.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    bottomLaunchRoller.setIdleMode(CANSparkMax.IdleMode.kBrake);
     //IR sensors
     stopScoringSensor = new DigitalInput(ScoringConstants.kScoringSensorPort);
   }

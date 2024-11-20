@@ -19,7 +19,11 @@ public class TeleopSignalCommand extends Command {
         m_LedSubsystem.clear();
         m_LedSubsystem
             .setColor(new Color(0, 255, 255))
-            .setAnimation(animations.SET_ALL);
+            .disableAnimation();
+            // .setBrightness(1)
+            // .setAnimSpeed(.5)
+            // .setOffset(0)
+            // .setAnimation(animations.RAINBOW_ANIM);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

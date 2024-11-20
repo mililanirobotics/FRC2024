@@ -19,7 +19,7 @@ public class LowNoteSignalCommand extends Command {
         m_LedSubsystem.clear();
         m_LedSubsystem
             .setColor(new Color(255, 192, 203))
-            .setAnimation(animations.SET_ALL);
+            .disableAnimation();
     }
 
     // Called every time the scheduler runs while the command is scheduled.

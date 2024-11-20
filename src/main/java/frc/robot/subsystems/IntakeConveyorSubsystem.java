@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.REVLibError;
+
 //constants
 import frc.robot.Constants.IntakeConveyorConstants;
 
@@ -28,9 +30,13 @@ public class IntakeConveyorSubsystem extends SubsystemBase {
     //setting directionality 
     greenRollerConveyor.setInverted(IntakeConveyorConstants.kGreenRollerConveyorReverse);
     blueRollerConveyor.setInverted(IntakeConveyorConstants.kBlueRollerConveyorReverse);
+    //setting brake
+    greenRollerConveyor.setIdleMode(CANSparkMax.IdleMode.kBrake);
+    blueRollerConveyor.setIdleMode(CANSparkMax.IdleMode.kBrake);
     //IR sensors
     startIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStartIntakeConveyorSensorPort);
     stopIntakeConveyorSensor = new DigitalInput(IntakeConveyorConstants.kStopIntakeConveyorSensorPort);
+
 
     isNoteIn = true;
   }

@@ -19,7 +19,7 @@ public class HangSignalCommand extends Command {
         m_LedSubsystem.clear();
         m_LedSubsystem
             .setColor(new Color(0, 255, 0))
-            .setAnimation(animations.SET_ALL);
+            .disableAnimation();
     }
 
     // Called every time the scheduler runs while the command is scheduled.

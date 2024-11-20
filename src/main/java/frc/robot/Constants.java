@@ -274,9 +274,12 @@ public final class Constants {
 
   public static class DriveConstants {
     // Drive Speed Constants
-    public static final double kDriveMaxMetersPerSecond = 4.95;
-    public static final double kRotationMaxRadiansPerSecond = 2 * Math.PI;
-    public static final double kDriveMetersPerSecondLimit = 1;//4.5;
+    public static final double kDriveMaxMetersPerSecond = 0.25;
+    //4.95
+    public static final double kRotationMaxRadiansPerSecond = 0.1 * Math.PI;
+    //2 * Math.PI
+    public static final double kDriveMetersPerSecondLimit = 0.1;//4.5;
+    //3
 
     public static final double kTeleDriveMaxAcceleration = kDriveMaxMetersPerSecond * 8;
     public static final double kTeleRotationMaxAngularAcceleration = kRotationMaxRadiansPerSecond * 8;
