@@ -150,7 +150,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
             }
         );
 
-        //Logging callback for target robot pose
+        //Logging callback for target robot posesma
         PathPlannerLogging.setLogTargetPoseCallback(
         (pose) -> {
             field.getObject("target pose").setPose(pose);
@@ -193,6 +193,7 @@ public class SwerveDriveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Right_front_power", rightFrontModule.getCurrentDrive());
         SmartDashboard.putNumber("Left_front_power", leftFrontModule.getCurrentDrive());
         SmartDashboard.putNumber("Left_back_power", leftBackModule.getCurrentDrive());
+        SmartDashboard.
     }
 
     //=========================================================================== 
